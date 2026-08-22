@@ -75,6 +75,7 @@ const Spellbook = () => {
 			cost: entry.cost ?? 0,
 			costText: entry.costText,
 			probeNote: entry.probeNote,
+			castTime: entry.castTime,
 			duration: entry.duration,
 			value: 0
 		}));
@@ -112,7 +113,7 @@ const Spellbook = () => {
 						</p>
 					) : (
 						<>
-						{/* Schmale Screens bekommen Karten: sechs Spalten schieben AsP, FW und
+						{/* Schmale Screens bekommen Karten: sieben Spalten schieben AsP, FW und
 						    Notiz sonst aus dem Bild. */}
 						<div className="space-y-3 sm:hidden">
 							{spells.map(spell => (
@@ -131,6 +132,9 @@ const Spellbook = () => {
 											</div>
 											{spell.costText && (
 												<div className="text-xs text-muted-foreground">{spell.costText}</div>
+											)}
+											{spell.castTime && (
+												<div className="text-xs text-muted-foreground">Dauer {spell.castTime}</div>
 											)}
 										</div>
 										<Button
@@ -183,6 +187,7 @@ const Spellbook = () => {
 									<tr className="border-b-2 border-aventurian-400 dark:border-aventurian-600">
 										<th className="p-3 text-left font-heading">Name</th>
 										<th className="p-3 text-center font-heading">Probe</th>
+										<th className="p-3 text-center font-heading">Dauer</th>
 										<th className="p-3 text-center font-heading">AsP</th>
 										<th className="p-3 text-center font-heading">FW</th>
 										<th className="p-3 text-left font-heading">Notiz</th>
@@ -208,6 +213,9 @@ const Spellbook = () => {
 														{spell.probeNote}
 													</div>
 												)}
+											</td>
+											<td className="p-3 text-center text-xs text-muted-foreground">
+												{spell.castTime ?? '–'}
 											</td>
 											<td className="p-3">
 												<PropertyNumber
@@ -322,7 +330,8 @@ const Spellbook = () => {
 													<div className="font-heading">{entry.name}</div>
 													<div className="truncate text-xs text-muted-foreground">
 														{entry.attributes.join('/')}
-														{entry.probeNote ? ` (${entry.probeNote})` : ''} · {entry.costText} · {entry.merkmal}
+														{entry.probeNote ? ` (${entry.probeNote})` : ''} · {entry.costText}
+														{entry.castTime ? ` · ${entry.castTime}` : ''} · {entry.merkmal}
 													</div>
 												</div>
 												{owned.has(entry.id) && (

@@ -145,6 +145,18 @@ describe('toCatalogEntry', () => {
 		expect(JSON.stringify(eintrag)).not.toContain('Fließtext');
 	});
 
+	it('gibt jedem Hexenfluch die Zauberdauer aus der Regel', () => {
+		const eintrag = toCatalogEntry({
+			Klasse: 'hexenfluch',
+			Name: 'Beute!',
+			Probe: 'KL/IN/CH',
+			'AsP-Kosten': '14 AsP',
+			Wirkungsdauer: 'QS x 3 in Tagen',
+			Merkmal: 'Einfluss'
+		});
+		expect(eintrag.castTime).toBe('mindestens 1 Aktion');
+	});
+
 	it('lässt die Felder weg, die einem Hexenfluch fehlen', () => {
 		const eintrag = toCatalogEntry({
 			Klasse: 'hexenfluch',
@@ -162,6 +174,7 @@ describe('toCatalogEntry', () => {
 			probeNote: 'modifiziert durch SK',
 			cost: 14,
 			costText: '14 AsP',
+			castTime: 'mindestens 1 Aktion',
 			duration: 'QS x 3 in Tagen',
 			merkmal: 'Einfluss'
 		});

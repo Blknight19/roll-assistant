@@ -12,6 +12,7 @@ import { initialSettingsState } from './settingsSlice';
 import { HISTORY_LIMIT, type RollHistoryEntry } from './rollSlice';
 import {
 	SPELL_COST_TEXT_MAX,
+	SPELL_CAST_TIME_MAX,
 	SPELL_DURATION_MAX,
 	SPELL_NAME_MAX,
 	SPELL_NOTE_MAX,
@@ -418,5 +419,72 @@ describe('Längengrenzen der Kennungen und Restfelder', () => {
 			{ id: 'h', type: 'Talent', values: [1, 2, 3], result: 'ok', date: 'd'.repeat(500) }
 		]);
 		expect(history).toHaveLength(0);
+	});
+});
+
+describe('Zauberdauer im Zauberbuch', () => {
+	it('trägt eine mitgelieferte Zauberdauer durch den Import', () => {
+		const book = sanitizeSpellbook({
+			spells: [{
+				id: 'a', name: 'Ignifaxius', attributes: ['MU', 'KL', 'CH'], cost: 8, value: 8,
+				castTime: '2 Aktionen'
+			}]
+		});
+		expect(book.spells[0].castTime).toBe('2 Aktionen');
+	});
+
+	it('kappt eine überlange Zauberdauer aus einer fremden Datei', () => {
+		const book = sanitizeSpellbook({
+			spells: [{
+				id: 'a', name: 'Ignifaxius', attributes: ['MU', 'KL', 'CH'], cost: 8, value: 8,
+				castTime: 'z'.repeat(300)
+			}]
+		});
+		expect(book.spells[0].castTime).toHaveLength(SPELL_CAST_TIME_MAX);
+	});
+
+	it('füllt die Zauberdauer eines übernommenen Zaubers aus dem Katalog nach', () => {
+		const state = migratePersisted({
+			version: 4,
+			characters: [{
+				spellbook: {
+					isSpellcaster: true,
+					spells: [{
+						id: 'a', catalogId: 'ignifaxius', name: 'Ignifaxius',
+						attributes: ['MU', 'KL', 'CH'], cost: 8, value: 8
+					}]
+				}
+			}]
+		});
+		expect(state!.spellbook.spells[0].castTime).toBe('2 Aktionen');
+	});
+
+	it('überschreibt eine vorhandene Zauberdauer beim Nachfüllen nicht', () => {
+		const state = migratePersisted({
+			version: 4,
+			characters: [{
+				spellbook: {
+					isSpellcaster: true,
+					spells: [{
+						id: 'a', catalogId: 'ignifaxius', name: 'Ignifaxius',
+						attributes: ['MU', 'KL', 'CH'], cost: 8, value: 8, castTime: 'von Hand'
+					}]
+				}
+			}]
+		});
+		expect(state!.spellbook.spells[0].castTime).toBe('von Hand');
+	});
+
+	it('lässt einen selbst angelegten Zauber ohne catalogId in Ruhe', () => {
+		const state = migratePersisted({
+			version: 4,
+			characters: [{
+				spellbook: {
+					isSpellcaster: true,
+					spells: [{ id: 'a', name: 'Eigenbau', attributes: ['KL', 'KL', 'IN'], cost: 4, value: 0 }]
+				}
+			}]
+		});
+		expect(state!.spellbook.spells[0].castTime).toBeUndefined();
 	});
 });

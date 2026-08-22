@@ -25,7 +25,7 @@ import {
 } from '@/store/spellRollSlice';
 import type { RootState } from '@/store';
 import { useResultScroll } from '@/hooks/useResultScroll';
-import { ChevronDown, Info, RotateCcw, Sparkle, StickyNote, Timer, Wand2, X } from 'lucide-react';
+import { ChevronDown, Hourglass, Info, RotateCcw, Sparkle, StickyNote, Timer, Wand2, X } from 'lucide-react';
 
 /** Begründung der Buchung – die halbe Zahl allein wirkt sonst wie ein Fehler. */
 const costNote = (roll: SpellRollSnapshot): string => {
@@ -204,6 +204,15 @@ const SpellRoll = () => {
 									FW <span className="font-bold">{spell.value}</span>
 								</span>
 							</div>
+
+							{/* Die Sanduhr trennt die Zauberdauer sichtbar vom Timer, der für die
+							    Wirkungsdauer laufender Zauber steht. */}
+							{spell.castTime && (
+								<p className="flex items-start gap-2 text-sm text-muted-foreground">
+									<Hourglass className="mt-0.5 h-4 w-4 shrink-0" />
+									<span>Zauberdauer {spell.castTime}</span>
+								</p>
+							)}
 
 							{spell.probeNote && (
 								<p className="flex items-start gap-2 text-sm text-magic-dark dark:text-magic-light">

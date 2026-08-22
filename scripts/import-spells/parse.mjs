@@ -88,8 +88,15 @@ export const MERKMALE = [
 	'Verwandlung'
 ];
 
-/** Feld je Klasse, das die Zauberdauer trägt. Hexenflüche nennen keine. */
+/** Feld je Klasse, das die Zauberdauer trägt. Hexenflüche führen keines. */
 const DAUER_FELD = { zauber: 'Zauberdauer', ritual: 'Ritualdauer', hexenfluch: null };
+
+/**
+ * Das Regelwerk nennt für Hexenflüche keine Dauer je Fluch, sondern eine für alle:
+ * direkt geschleudert dauert ein Fluch mindestens 1 Aktion. Über den Vertrauten
+ * übertragen wird daraus ein Ritual von einer Stunde.
+ */
+const HEXENFLUCH_DAUER = 'mindestens 1 Aktion';
 
 /**
  * Obergrenzen der Textfelder. Sie spiegeln die Konstanten aus
@@ -181,7 +188,7 @@ export const toCatalogEntry = roh => {
 	if (probeNote !== undefined) eintrag.probeNote = pruefeText(probeNote, 'probeNote');
 
 	const dauerFeld = DAUER_FELD[klasse];
-	const castTime = dauerFeld === null ? undefined : feld(roh, dauerFeld);
+	const castTime = dauerFeld === null ? HEXENFLUCH_DAUER : feld(roh, dauerFeld);
 	if (castTime !== undefined) {
 		eintrag.castTime = pruefeText(normalisiereCastTime(castTime), 'castTime');
 	}

@@ -9,6 +9,7 @@ export const HEXENFLUESCHE: SpellCatalogEntry[] = [
 		probeNote: 'modifiziert durch SK',
 		cost: 14,
 		costText: '14 AsP',
+		castTime: 'mindestens 1 Aktion',
 		duration: 'QS x 3 Tage',
 		merkmal: 'Einfluss'
 	},
@@ -20,6 +21,7 @@ export const HEXENFLUESCHE: SpellCatalogEntry[] = [
 		probeNote: 'modifiziert durch ZK',
 		cost: 14,
 		costText: '14 AsP',
+		castTime: 'mindestens 1 Aktion',
 		duration: 'QS x 3 in Tagen',
 		merkmal: 'Objekt'
 	},
@@ -31,6 +33,7 @@ export const HEXENFLUESCHE: SpellCatalogEntry[] = [
 		probeNote: 'modifiziert durch SK',
 		cost: 14,
 		costText: '14 AsP',
+		castTime: 'mindestens 1 Aktion',
 		duration: 'QS x 3 in Tagen',
 		merkmal: 'Einfluss'
 	},
@@ -42,6 +45,7 @@ export const HEXENFLUESCHE: SpellCatalogEntry[] = [
 		probeNote: 'modifiziert durch ZK',
 		cost: 14,
 		costText: '14 AsP',
+		castTime: 'mindestens 1 Aktion',
 		duration: 'QS x 3 Tage',
 		merkmal: 'Verwandlung'
 	},
@@ -53,6 +57,7 @@ export const HEXENFLUESCHE: SpellCatalogEntry[] = [
 		probeNote: 'modifiziert durch ZK',
 		cost: 7,
 		costText: '7 AsP',
+		castTime: 'mindestens 1 Aktion',
 		duration: 'QS x 3 Wochen',
 		merkmal: 'Verwandlung'
 	},
@@ -64,6 +69,7 @@ export const HEXENFLUESCHE: SpellCatalogEntry[] = [
 		probeNote: 'modifiziert durch ZK',
 		cost: 14,
 		costText: '14 AsP',
+		castTime: 'mindestens 1 Aktion',
 		duration: 'QS x 3 Tage',
 		merkmal: 'Dämonisch'
 	},
@@ -74,6 +80,7 @@ export const HEXENFLUESCHE: SpellCatalogEntry[] = [
 		attributes: ['MU', 'IN', 'CH'],
 		cost: 21,
 		costText: '21 AsP',
+		castTime: 'mindestens 1 Aktion',
 		duration: 'QS x 15 Minuten',
 		merkmal: 'Elementar'
 	},
@@ -85,6 +92,7 @@ export const HEXENFLUESCHE: SpellCatalogEntry[] = [
 		probeNote: 'modifiziert durch ZK',
 		cost: 14,
 		costText: '14 AsP',
+		castTime: 'mindestens 1 Aktion',
 		duration: 'QS x 3 Stunden',
 		merkmal: 'Verwandlung'
 	},
@@ -96,6 +104,7 @@ export const HEXENFLUESCHE: SpellCatalogEntry[] = [
 		probeNote: 'modifiziert durch SK',
 		cost: 7,
 		costText: '7 AsP',
+		castTime: 'mindestens 1 Aktion',
 		duration: 'QS x 3 Tage',
 		merkmal: 'Einfluss'
 	},
@@ -107,6 +116,7 @@ export const HEXENFLUESCHE: SpellCatalogEntry[] = [
 		probeNote: 'modifiziert durch SK',
 		cost: 14,
 		costText: '14 AsP',
+		castTime: 'mindestens 1 Aktion',
 		duration: 'QS x 3 Stunden',
 		merkmal: 'Illusion'
 	},
@@ -117,6 +127,7 @@ export const HEXENFLUESCHE: SpellCatalogEntry[] = [
 		attributes: ['KL', 'IN', 'KO'],
 		cost: 14,
 		costText: '14 AsP',
+		castTime: 'mindestens 1 Aktion',
 		duration: 'sofort',
 		merkmal: 'Dämonisch'
 	},
@@ -128,6 +139,7 @@ export const HEXENFLUESCHE: SpellCatalogEntry[] = [
 		probeNote: 'modifiziert durch SK',
 		cost: 14,
 		costText: '14 AsP',
+		castTime: 'mindestens 1 Aktion',
 		duration: 'QS x 3 Stunden',
 		merkmal: 'Dämonisch'
 	},
@@ -139,6 +151,7 @@ export const HEXENFLUESCHE: SpellCatalogEntry[] = [
 		probeNote: 'modifiziert durch SK',
 		cost: 7,
 		costText: '7 AsP',
+		castTime: 'mindestens 1 Aktion',
 		duration: 'QS x 3 Stunden',
 		merkmal: 'Einfluss'
 	},
@@ -150,6 +163,7 @@ export const HEXENFLUESCHE: SpellCatalogEntry[] = [
 		probeNote: 'modifiziert durch SK',
 		cost: 21,
 		costText: '21 AsP',
+		castTime: 'mindestens 1 Aktion',
 		duration: 'QS x 30 Minuten',
 		merkmal: 'Einfluss'
 	},
@@ -161,6 +175,7 @@ export const HEXENFLUESCHE: SpellCatalogEntry[] = [
 		probeNote: 'modifiziert durch SK',
 		cost: 7,
 		costText: '7 AsP',
+		castTime: 'mindestens 1 Aktion',
 		duration: 'QS x 3 in Tagen',
 		merkmal: 'Einfluss'
 	},
@@ -172,6 +187,7 @@ export const HEXENFLUESCHE: SpellCatalogEntry[] = [
 		probeNote: 'modifiziert durch ZK',
 		cost: null,
 		costText: 'Stufe der Krankheit in AsP',
+		castTime: 'mindestens 1 Aktion',
 		duration: 'bis zum Ende der Krankheit, maximal aber QS x 3 in Tagen',
 		merkmal: 'Dämonisch'
 	},
@@ -183,6 +199,7 @@ export const HEXENFLUESCHE: SpellCatalogEntry[] = [
 		probeNote: 'modifiziert durch SK',
 		cost: 14,
 		costText: '14 AsP',
+		castTime: 'mindestens 1 Aktion',
 		duration: 'QS x 3 in Tagen',
 		merkmal: 'Einfluss'
 	},
@@ -194,6 +211,7 @@ export const HEXENFLUESCHE: SpellCatalogEntry[] = [
 		probeNote: 'modifiziert durch SK',
 		cost: 21,
 		costText: '21 AsP',
+		castTime: 'mindestens 1 Aktion',
 		duration: 'QS x 3 Tage',
 		merkmal: 'Dämonisch'
 	},
@@ -205,6 +223,7 @@ export const HEXENFLUESCHE: SpellCatalogEntry[] = [
 		probeNote: 'modifiziert durch ZK',
 		cost: 14,
 		costText: '14 AsP',
+		castTime: 'mindestens 1 Aktion',
 		duration: 'QS x 3 in Wochen',
 		merkmal: 'Verwandlung'
 	},
@@ -216,6 +235,7 @@ export const HEXENFLUESCHE: SpellCatalogEntry[] = [
 		probeNote: 'modifiziert durch SK',
 		cost: 7,
 		costText: '7 AsP',
+		castTime: 'mindestens 1 Aktion',
 		duration: 'QS Tage',
 		merkmal: 'Dämonisch'
 	},
@@ -227,6 +247,7 @@ export const HEXENFLUESCHE: SpellCatalogEntry[] = [
 		probeNote: 'modifiziert durch ZK',
 		cost: 7,
 		costText: '7 AsP',
+		castTime: 'mindestens 1 Aktion',
 		duration: 'QS x 3 in Tagen',
 		merkmal: 'Verwandlung'
 	},
@@ -238,6 +259,7 @@ export const HEXENFLUESCHE: SpellCatalogEntry[] = [
 		probeNote: 'modifiziert durch SK',
 		cost: 14,
 		costText: '14 AsP',
+		castTime: 'mindestens 1 Aktion',
 		duration: 'QS x 3 Stunden',
 		merkmal: 'Einfluss'
 	},
@@ -249,6 +271,7 @@ export const HEXENFLUESCHE: SpellCatalogEntry[] = [
 		probeNote: 'modifiziert durch ZK',
 		cost: 14,
 		costText: '14 AsP',
+		castTime: 'mindestens 1 Aktion',
 		duration: 'QS x 3 in Stunden',
 		merkmal: 'Einfluss'
 	},
@@ -260,6 +283,7 @@ export const HEXENFLUESCHE: SpellCatalogEntry[] = [
 		probeNote: 'modifiziert durch ZK',
 		cost: 7,
 		costText: '7 AsP',
+		castTime: 'mindestens 1 Aktion',
 		duration: 'QS x 3 Stunden',
 		merkmal: 'Verwandlung'
 	}

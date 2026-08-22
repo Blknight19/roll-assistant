@@ -16,6 +16,8 @@ export type Spell = {
 	costText?: string;
 	/** Zusatz zur Probe aus dem Katalog, z. B. „modifiziert durch ZK". Reine Anzeige. */
 	probeNote?: string;
+	/** Zauberdauer aus dem Katalog, z. B. „2 Aktionen". Reine Anzeige. */
+	castTime?: string;
 	duration?: string;
 	value: number;
 	/** Freie Notiz des Spielers – Merkhilfe, keine Regelmechanik. */
@@ -48,6 +50,7 @@ export const ASP_MAX = 999;
 export const SPELL_COST_TEXT_MAX = 160;
 export const SPELL_PROBE_NOTE_MAX = 90;
 export const SPELL_DURATION_MAX = 80;
+export const SPELL_CAST_TIME_MAX = 60;
 export const SPELL_NOTE_MAX = 500;
 
 export const initialSpellbookState: SpellbookState = {
@@ -90,6 +93,7 @@ const normalizeSpell = (spell: Spell): Spell => ({
 	costText: clampSpellText(spell.costText, SPELL_COST_TEXT_MAX),
 	probeNote: clampSpellText(spell.probeNote, SPELL_PROBE_NOTE_MAX),
 	duration: clampSpellText(spell.duration, SPELL_DURATION_MAX),
+	castTime: clampSpellText(spell.castTime, SPELL_CAST_TIME_MAX),
 	note: clampSpellText(spell.note, SPELL_NOTE_MAX)
 });
 

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
 	SPELL_COST_TEXT_MAX,
+	SPELL_CAST_TIME_MAX,
 	SPELL_DURATION_MAX,
 	SPELL_NOTE_MAX,
 	SPELL_PROBE_NOTE_MAX,
@@ -130,11 +131,13 @@ describe('spellbookReducer', () => {
 			costText: 'k'.repeat(200),
 			probeNote: 'p'.repeat(200),
 			duration: 'd'.repeat(200),
+			castTime: 'z'.repeat(200),
 			note: 'n'.repeat(900)
 		})));
 		expect(state.spells[0].costText).toHaveLength(SPELL_COST_TEXT_MAX);
 		expect(state.spells[0].probeNote).toHaveLength(SPELL_PROBE_NOTE_MAX);
 		expect(state.spells[0].duration).toHaveLength(SPELL_DURATION_MAX);
+		expect(state.spells[0].castTime).toHaveLength(SPELL_CAST_TIME_MAX);
 		expect(state.spells[0].note).toHaveLength(SPELL_NOTE_MAX);
 	});
 

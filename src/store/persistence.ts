@@ -23,6 +23,7 @@ import { initialSettingsState, type SettingsState } from './settingsSlice';
 import {
 	ASP_MAX,
 	SPELL_COST_TEXT_MAX,
+	SPELL_CAST_TIME_MAX,
 	SPELL_DURATION_MAX,
 	SPELL_LIMIT,
 	SPELL_NOTE_MAX,
@@ -36,6 +37,7 @@ import {
 	type SpellbookState
 } from './spellbookSlice';
 import { clampTalentValue, initialTalentState, type Talent, type TalentState } from './talentsSlice';
+import { SPELL_CATALOG } from '@/data/spells';
 
 const STORAGE_KEY = 'dsa-app-state';
 
@@ -183,6 +185,7 @@ const sanitizeSpell = (raw: unknown): Spell | undefined => {
 		costText: clampSpellText(raw.costText, SPELL_COST_TEXT_MAX),
 		probeNote: clampSpellText(raw.probeNote, SPELL_PROBE_NOTE_MAX),
 		duration: clampSpellText(raw.duration, SPELL_DURATION_MAX),
+		castTime: clampSpellText(raw.castTime, SPELL_CAST_TIME_MAX),
 		value: clampTalentValue(raw.value),
 		note: clampSpellText(raw.note, SPELL_NOTE_MAX)
 	};
@@ -281,11 +284,26 @@ export const migratePersisted = (raw: unknown): PersistedSlices | undefined => {
 		attributes: sanitizeAttributes(source.attributes),
 		talents: { talents: sanitizeTalents(talents) },
 		combat: sanitizeCombat(source.combat),
-		spellbook: sanitizeSpellbook(source.spellbook),
+		spellbook: fillCastTimes(sanitizeSpellbook(source.spellbook)),
 		roll: { history: sanitizeHistory(history) },
 		settings: sanitizeSettings(legacy ? undefined : raw.settings)
 	};
 };
+
+/**
+ * Trägt die Zauberdauer für Zauber nach, die vor ihrer Einführung übernommen wurden.
+ * Einmalig beim Laden, nicht im laufenden Betrieb: was einmal im Buch steht, gehört
+ * dem Spieler. Ein Zauber ohne `catalogId` und einer, den der Katalog nicht mehr
+ * kennt, bleiben unberührt.
+ */
+const fillCastTimes = (book: SpellbookState): SpellbookState => ({
+	...book,
+	spells: book.spells.map(spell => {
+		if (spell.castTime !== undefined || spell.catalogId === undefined) return spell;
+		const entry = SPELL_CATALOG.find(candidate => candidate.id === spell.catalogId);
+		return entry?.castTime === undefined ? spell : { ...spell, castTime: entry.castTime };
+	})
+});
 
 export const toPersisted = (state: PersistedSlices): PersistedState => ({
 	version: PERSISTED_VERSION,
