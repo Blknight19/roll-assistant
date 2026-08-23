@@ -3099,7 +3099,7 @@ export const ZAUBER: SpellCatalogEntry[] = [
 		duration: 'QS x 3 Kampfrunden',
 		target: 'Zone',
 		merkmal: 'Elementar',
-		verbreitung: ['Druiden', 'Geoden', 'Gildenmagier', 'Nachtalben']
+		verbreitung: ['Druiden', 'Geoden', 'Gildenmagier', 'Kristallomanten', 'Nachtalben']
 	},
 	{
 		id: 'sturm-der-verunsicherung',

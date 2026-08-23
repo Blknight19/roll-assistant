@@ -54,6 +54,8 @@ const Spellbook = () => {
 	const full = spells.length >= SPELL_LIMIT;
 	const owned = new Set(spells.map(spell => spell.catalogId).filter(Boolean));
 
+	const gefiltert = verbreitung !== ALLE || merkmal !== ALLE;
+
 	const catalog = useMemo(
 		() =>
 			SPELL_CATALOG.filter(
@@ -316,7 +318,25 @@ const Spellbook = () => {
 							<Command>
 								<CommandInput placeholder="Zauber suchen…" className="font-body" />
 								<CommandList>
-									<CommandEmpty>Kein Zauber gefunden</CommandEmpty>
+									<CommandEmpty>
+										{gefiltert ? (
+											<div className="space-y-2">
+												<p>Kein Treffer unter den gewählten Filtern.</p>
+												<Button
+													variant="outline"
+													size="sm"
+													onClick={() => {
+														setVerbreitung(ALLE);
+														setMerkmal(ALLE);
+													}}
+												>
+													Filter zurücksetzen
+												</Button>
+											</div>
+										) : (
+											'Kein Zauber gefunden'
+										)}
+									</CommandEmpty>
 									<CommandGroup heading={`${catalog.length} von ${SPELL_CATALOG.length}`}>
 										{catalog.map(entry => (
 											<CommandItem

@@ -19,5 +19,11 @@ export const KORREKTUREN = {
 	somnigravis: {
 		grund: 'Regelwerk S. 298; Quelle nennt abweichend 8 Aktionen',
 		felder: { castTime: '2 Aktionen' }
+	},
+	stillstand: {
+		grund: 'Regelwiki nennt Kristallomanten mit; die Quelle führt diese Tradition kaum',
+		felder: {
+			verbreitung: ['Druiden', 'Geoden', 'Gildenmagier', 'Kristallomanten', 'Nachtalben']
+		}
 	}
 };
