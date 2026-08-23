@@ -11,6 +11,7 @@ import '@fontsource/crimson-text/600.css';
 import '@fontsource/crimson-text/400-italic.css';
 import './index.css';
 import App from './App.tsx';
+import { registerAppUpdate } from './utils/registerAppUpdate';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -21,3 +22,5 @@ createRoot(document.getElementById('root')!).render(
     </Provider>
   </StrictMode>,
 );
+
+registerAppUpdate();

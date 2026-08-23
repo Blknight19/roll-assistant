@@ -1,4 +1,5 @@
 /// <reference types="vitest/config" />
+import { execSync } from 'child_process';
 import path from 'path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
@@ -28,13 +29,25 @@ const cspPlugin = {
     ),
 };
 
+/** Kurzer Commit-Hash, damit man im Support fragen kann, welche Version jemand sieht. */
+const appVersion = () => {
+  try {
+    return execSync('git rev-parse --short HEAD').toString().trim();
+  } catch {
+    return 'unbekannt';
+  }
+};
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
     cspPlugin,
     VitePWA({
-      registerType: 'autoUpdate',
+      // 'prompt' statt 'autoUpdate': der neue Worker wartet, statt den laufenden
+      // Tab zu übernehmen und dessen Dateien wegzuräumen. Erst der Reload wechselt.
+      registerType: 'prompt',
+      injectRegister: null,
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
         name: 'DSA Roll Assistant',
@@ -56,6 +69,9 @@ export default defineConfig({
       },
     }),
   ],
+  define: {
+    __APP_VERSION__: JSON.stringify(appVersion()),
+  },
   base: '/dsa-roll-assistant/',
   resolve: {
     alias: {

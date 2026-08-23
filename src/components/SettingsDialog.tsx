@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import HeroSettings from './HeroSettings';
 import RulesSettings from './RulesSettings';
 import ImportExportSettings from './ImportExportSettings';
+import AppSettings from './AppSettings';
 import { Settings } from 'lucide-react';
 
 const SettingsDialog = () => {
@@ -26,6 +27,7 @@ const SettingsDialog = () => {
 					<HeroSettings />
 					<RulesSettings />
 					<ImportExportSettings />
+					<AppSettings />
 				</div>
 			</DialogContent>
 		</Dialog>
