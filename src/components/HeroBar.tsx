@@ -5,6 +5,7 @@ import type { RootState } from '@/store';
 import { CHARACTER_NAME_MAX, setCharacterName } from '@/store/profileSlice';
 import { Pencil, User } from 'lucide-react';
 import ResourceBar from './ResourceBar';
+import { DEVOTION_LEVELS } from '@/data/liturgies/devotion';
 
 /**
  * Name und Lebensenergie auf jedem Tab. Die LeP lag früher am Ende des Kampf-Tabs –
@@ -18,6 +19,7 @@ const HeroBar = () => {
 	const isSpellcaster = useSelector((state: RootState) => state.spellbook.isSpellcaster);
 	const kap = useSelector((state: RootState) => state.karma.kap);
 	const isBlessed = useSelector((state: RootState) => state.karma.isBlessed);
+	const devotionLevel = useSelector((state: RootState) => state.karma.devotionLevel);
 	const [editing, setEditing] = useState(false);
 
 	return (
@@ -58,6 +60,16 @@ const HeroBar = () => {
 				)}
 				{isBlessed && (
 					<ResourceBar label="KaP" current={kap.current} max={kap.max} tone="karma" className="w-24 sm:w-36" />
+				)}
+				{/* Entrückung wirkt auf Talente und Zauber, also außerhalb des Liturgie-Tabs.
+				    Deshalb steht die Stufe hier, wo sie auf jedem Tab sichtbar ist. */}
+				{isBlessed && devotionLevel > 0 && (
+					<span
+						className="rounded-full border border-karma px-2 py-0.5 font-heading text-xs font-semibold text-karma-dark dark:text-karma-light"
+						aria-label={`Entrückung Stufe ${devotionLevel}`}
+					>
+						E {DEVOTION_LEVELS[devotionLevel].roman}
+					</span>
 				)}
 			</div>
 		</div>

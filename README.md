@@ -9,12 +9,18 @@ Ein digitaler Würfelassistent und Charakterbogen.
 - **Kampfwürfe** (Attacke, Parade, Ausweichen, Fernkampf, Initiative)
 - **Zauberproben** (3W20) mit automatischer AsP-Buchung, halbe Kosten bei misslungener Probe und bei kritischem Erfolg
 - **Zauberbuch** mit durchsuchbarem Zauberkatalog und eigenen Zaubern
-- **Laufende Zauber** mit automatischer Erschwernis (−1 je aufrechterhaltenem Zauber)
+- **Liturgie- und Zeremonieproben** (3W20) mit automatischer KaP-Buchung, halben Kosten bei misslungener Probe und kritischem Erfolg, „+1W6 auf die FP" beim Krit und optionaler Regel „Keine Patzer bei Liturgien"
+- **Segen** als Knopfleiste: ein Tipp bucht 1 KaP und protokolliert den Segen ohne Wurf
+- **Umstände** als benannte Modifikatoren: Ort und Zeit der Zeremonie, fehlendes Gebet oder fehlende Geste, Modifikationen (Erzwingen, Kosten senken …) samt Kostenfolge
+- **Liturgienbuch** mit Katalog (185 Liturgien, 131 Zeremonien, 12 Segen), Filter nach Tradition und Gattung
+- **Entrückung** als Stufenzähler mit Tabelle: was jede Stufe auf Talent- und Zauberproben bewirkt
+- **Laufende Effekte** zählen Zauber und Liturgien gemeinsam (−1 je Effekt auf alle Zauber- und Liturgieproben)
 - **Charakterverwaltung**
   - Eigenschaften (MU, KL, IN, CH, FF, GE, KO, KK)
   - 59 DSA-Talente
   - Kampfwerte & Lebensenergie
   - Astralenergie & Zauberbuch (für zauberkundige Helden)
+  - Karmaenergie & Liturgienbuch (für geweihte Helden), Tradition mit KaP-Richtwert
 - **Würfelhistorie** mit LocalStorage-Persistenz
 - **Import/Export** von Charakterdaten (.dsa-Datei)
 - **Dark/Light Mode** mit automatischer Systemerkennung
