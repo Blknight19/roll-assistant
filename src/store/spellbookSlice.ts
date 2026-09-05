@@ -36,7 +36,11 @@ export type SpellbookState = {
 	upkeep: UpkeepEntry[];
 };
 
-export const SPELL_NAME_MAX = 60;
+/**
+ * Deckt auch den längsten Katalognamen ab: „Herbeirufung der Heerscharen des
+ * Rattenkindes (Vampirfledermäuse)" braucht 65 Zeichen.
+ */
+export const SPELL_NAME_MAX = 70;
 /** Weit über jedem gespielten Magier – Grenze gegen präparierte Importdateien. */
 export const SPELL_LIMIT = 100;
 export const SPELL_COST_MAX = 99;
@@ -49,7 +53,7 @@ export const ASP_MAX = 999;
  */
 export const SPELL_COST_TEXT_MAX = 160;
 export const SPELL_PROBE_NOTE_MAX = 90;
-export const SPELL_DURATION_MAX = 80;
+export const SPELL_DURATION_MAX = 120;
 export const SPELL_CAST_TIME_MAX = 60;
 export const SPELL_NOTE_MAX = 500;
 

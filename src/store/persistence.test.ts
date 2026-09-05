@@ -171,7 +171,7 @@ describe('sanitizeSpellbook', () => {
 		const book = sanitizeSpellbook({
 			spells: [{ id: 'a', name: 'x'.repeat(300), attributes: ['KL', 'IN', 'IN'], cost: 5000, value: 99 }]
 		});
-		expect(book.spells[0].name).toHaveLength(60);
+		expect(book.spells[0].name).toHaveLength(SPELL_NAME_MAX);
 		expect(book.spells[0].cost).toBe(99);
 		expect(book.spells[0].value).toBe(25);
 	});

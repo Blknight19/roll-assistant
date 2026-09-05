@@ -4,6 +4,7 @@ import {
 	applyKorrektur,
 	normalisiereCastTime,
 	normalisiereDuration,
+	normalisiereVerbreitung,
 	parseCost,
 	parseProbe,
 	renderModule,
@@ -191,7 +192,7 @@ describe('toCatalogEntry', () => {
 	});
 
 	it('lehnt eine unbekannte Klasse ab', () => {
-		expect(() => toCatalogEntry({ ...IGNIFAXIUS, Klasse: 'liturgie' })).toThrow(/Klasse/);
+		expect(() => toCatalogEntry({ ...IGNIFAXIUS, Klasse: 'zaubertrick' })).toThrow(/Klasse/);
 	});
 
 	const BEL = String.fromCodePoint(0x0007);
@@ -299,5 +300,116 @@ describe('normalisiere', () => {
 
 	it('rührt ein OS innerhalb eines Wortes nicht an', () => {
 		expect(normalisiereDuration('KOSTEN')).toBe('KOSTEN');
+	});
+});
+
+describe('parseCost mit KaP', () => {
+	it('liest KaP wie AsP', () => {
+		expect(parseCost('16 KaP')).toBe(16);
+		expect(parseCost('8 KaP (Kosten sind nicht modifizierbar)')).toBe(8);
+	});
+
+	it('gibt null für Aktivierung plus Intervall zurück', () => {
+		expect(parseCost('4 KaP (Aktivierung der Liturgie) + 2 KaP pro Minute')).toBeNull();
+	});
+
+	it('gibt null für teils permanente Kosten zurück', () => {
+		expect(parseCost('16 KaP, davon 2 permanent (Kosten sind nicht modifizierbar)')).toBeNull();
+	});
+
+	it('akzeptiert Zeremonienkosten bis 256', () => {
+		expect(parseCost('256 KaP', 256)).toBe(256);
+		expect(() => parseCost('256 KaP')).toThrow();
+	});
+});
+
+const WAHRHEIT = {
+	Klasse: 'liturgie',
+	Name: 'Wahrheit',
+	Probe: 'MU/KL/IN (modifiziert durch SK)',
+	Liturgiedauer: '8 Aktion(en)',
+	'KaP-Kosten': '16 KaP',
+	Reichweite: 'Berührung',
+	Wirkungsdauer: 'QS x 3 in Minuten',
+	Zielkategorie: 'Kulturschaffende',
+	Verbreitung: 'Gjalskerschamanen (Gemeinschaft), Nandus (Erkenntnis), Praios (Ordnung)',
+	Steigerungsfaktor: 'C',
+	Wirkung: 'Langer urheberrechtlich geschützter Fließtext.',
+	'Publikation(en)': 'Regelwerk, Seite 331'
+};
+
+const SPEISESEGEN = {
+	Klasse: 'segen',
+	Name: 'Speisesegen',
+	Wirkung: 'Langer urheberrechtlich geschützter Fließtext.',
+	Reichweite: 'Berührung',
+	Wirkungsdauer: 'sofort',
+	Zielkategorie: 'Objekte',
+	Aspekt: 'Allgemein',
+	'Publikation(en)': 'Regelwerk, Seite 323'
+};
+
+describe('toCatalogEntry für karmale Klassen', () => {
+	it('bildet eine Liturgie mit Verbreitungspaaren ab', () => {
+		expect(toCatalogEntry(WAHRHEIT)).toEqual({
+			id: 'wahrheit',
+			klasse: 'liturgie',
+			name: 'Wahrheit',
+			attributes: ['MU', 'KL', 'IN'],
+			probeNote: 'modifiziert durch SK',
+			cost: 16,
+			costText: '16 KaP',
+			castTime: '8 Aktionen',
+			range: 'Berührung',
+			duration: 'QS x 3 in Minuten',
+			target: 'Kulturschaffende',
+			verbreitung: ['Gjalskerschamanen (Gemeinschaft)', 'Nandus (Erkenntnis)', 'Praios (Ordnung)']
+		});
+	});
+
+	it('gibt einem Segen die Regelwerte statt fehlender Felder', () => {
+		expect(toCatalogEntry(SPEISESEGEN)).toEqual({
+			id: 'speisesegen',
+			klasse: 'segen',
+			name: 'Speisesegen',
+			cost: 1,
+			costText: '1 KaP',
+			castTime: '1 Aktion',
+			range: 'Berührung',
+			duration: 'sofort',
+			target: 'Objekte',
+			verbreitung: ['Allgemein']
+		});
+	});
+
+	it('liest die Zeremoniedauer als castTime', () => {
+		const roh = { ...WAHRHEIT, Klasse: 'zeremonie', Zeremoniedauer: '30 Minuten' };
+		delete roh.Liturgiedauer;
+		const eintrag = toCatalogEntry(roh);
+		expect(eintrag.klasse).toBe('zeremonie');
+		expect(eintrag.castTime).toBe('30 Minuten');
+	});
+
+	it('lehnt Kosten in AsP bei karmalen Klassen nicht ab – das regelt die Korrektur', () => {
+		expect(toCatalogEntry({ ...WAHRHEIT, 'KaP-Kosten': '8 AsP' }).costText).toBe('8 AsP');
+	});
+});
+
+describe('renderModule mit eigenem Typ', () => {
+	it('importiert den angegebenen Typnamen', () => {
+		const code = renderModule('SEGEN', [toCatalogEntry(SPEISESEGEN)], 'LiturgyCatalogEntry');
+		expect(code.startsWith("import type { LiturgyCatalogEntry } from './types';")).toBe(true);
+		expect(code).toContain('export const SEGEN: LiturgyCatalogEntry[] = [');
+	});
+});
+
+describe('normalisiereVerbreitung', () => {
+	it('schreibt die Mohaschamanen der Quelle auf Tahayaschamanen um', () => {
+		expect(normalisiereVerbreitung('Mohaschamanen (Sonne)')).toBe('Tahayaschamanen (Sonne)');
+	});
+
+	it('rührt andere Traditionen nicht an', () => {
+		expect(normalisiereVerbreitung('Praios (Ordnung)')).toBe('Praios (Ordnung)');
+		expect(normalisiereVerbreitung('Allgemein')).toBe('Allgemein');
 	});
 });

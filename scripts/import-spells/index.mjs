@@ -11,16 +11,18 @@ import { writeFileSync } from 'node:fs';
 import { argv } from 'node:process';
 import JSON5 from 'json5';
 import { KORREKTUREN } from './korrekturen.mjs';
-import { KLASSEN, applyKorrektur, renderModule, toCatalogEntry } from './parse.mjs';
+import { KARMA_KLASSEN, KLASSEN, applyKorrektur, renderModule, toCatalogEntry } from './parse.mjs';
 
 const QUELLE = 'https://www.f-space.de/dsa5/tools/spells/spells-data.js';
-const ZIEL = 'src/data/spells';
 
 /** Ein Export je Klasse – die Dateien bleiben so klein genug, um sie zu lesen. */
 const DATEIEN = {
-	zauber: { datei: 'zauber.ts', exportName: 'ZAUBER' },
-	ritual: { datei: 'rituale.ts', exportName: 'RITUALE' },
-	hexenfluch: { datei: 'hexenfluesche.ts', exportName: 'HEXENFLUESCHE' }
+	zauber: { ziel: 'src/data/spells', datei: 'zauber.ts', exportName: 'ZAUBER', typ: 'SpellCatalogEntry' },
+	ritual: { ziel: 'src/data/spells', datei: 'rituale.ts', exportName: 'RITUALE', typ: 'SpellCatalogEntry' },
+	hexenfluch: { ziel: 'src/data/spells', datei: 'hexenfluesche.ts', exportName: 'HEXENFLUESCHE', typ: 'SpellCatalogEntry' },
+	liturgie: { ziel: 'src/data/liturgies', datei: 'liturgien.ts', exportName: 'LITURGIEN', typ: 'LiturgyCatalogEntry' },
+	zeremonie: { ziel: 'src/data/liturgies', datei: 'zeremonien.ts', exportName: 'ZEREMONIEN', typ: 'LiturgyCatalogEntry' },
+	segen: { ziel: 'src/data/liturgies', datei: 'segen.ts', exportName: 'SEGEN', typ: 'LiturgyCatalogEntry' }
 };
 
 /** Schneidet die Objektliste aus der Zuweisung `var DATA_RAW = [...]`. */
@@ -32,7 +34,12 @@ const ladeQuelle = async () => {
 	return antwort.text();
 };
 
-const eintraege = new Map();
+/**
+ * Ein Katalog je Zielordner: Zauberbuch und Liturgienbuch vergeben ihre IDs
+ * unabhängig voneinander, „Schlangenruf" gibt es als Zauber und als Liturgie.
+ */
+const kataloge = { magie: new Map(), karma: new Map() };
+const gruppeVon = klasse => (KARMA_KLASSEN.includes(klasse) ? 'karma' : 'magie');
 const abgelehnt = [];
 
 const roh = JSON5.parse(arrayLiteral(await ladeQuelle()));
@@ -42,9 +49,13 @@ for (const datensatz of roh) {
 
 	try {
 		const eintrag = applyKorrektur(toCatalogEntry(datensatz), KORREKTUREN);
-		const bekannt = eintraege.get(eintrag.id);
+		if (KARMA_KLASSEN.includes(eintrag.klasse) && eintrag.verbreitung.length === 0) {
+			throw new Error('Verbreitung fehlt');
+		}
+		const katalog = kataloge[gruppeVon(eintrag.klasse)];
+		const bekannt = katalog.get(eintrag.id);
 		if (bekannt !== undefined) throw new Error(`id ${eintrag.id} doppelt (${bekannt.name})`);
-		eintraege.set(eintrag.id, eintrag);
+		katalog.set(eintrag.id, eintrag);
 	} catch (ursache) {
 		abgelehnt.push(`${datensatz.Name ?? '?'}: ${ursache.message}`);
 	}
@@ -52,19 +63,31 @@ for (const datensatz of roh) {
 
 for (const zeile of abgelehnt) console.error(`abgelehnt – ${zeile}`);
 
-const unbenutzt = Object.keys(KORREKTUREN).filter(id => !eintraege.has(id));
+const unbenutzt = Object.keys(KORREKTUREN).filter(
+	id => !kataloge.magie.has(id) && !kataloge.karma.has(id)
+);
 if (unbenutzt.length > 0) {
 	throw new Error(`Korrekturen ohne Eintrag: ${unbenutzt.join(', ')}`);
 }
 
+// Korrekturen greifen allein über die id. Trägt eine id in beiden Katalogen einen
+// Eintrag, träfe eine Korrektur unbeabsichtigt auch den anderen.
+const mehrdeutig = Object.keys(KORREKTUREN).filter(
+	id => kataloge.magie.has(id) && kataloge.karma.has(id)
+);
+if (mehrdeutig.length > 0) {
+	throw new Error(`Korrekturen treffen beide Kataloge: ${mehrdeutig.join(', ')}`);
+}
+
 if (argv.includes('--dry-run')) {
-	console.log(`${eintraege.size} Einträge gelesen, ${abgelehnt.length} abgelehnt (dry run)`);
+	const gelesen = kataloge.magie.size + kataloge.karma.size;
+	console.log(`${gelesen} Einträge gelesen, ${abgelehnt.length} abgelehnt (dry run)`);
 } else {
-	for (const [klasse, { datei, exportName }] of Object.entries(DATEIEN)) {
-		const gruppe = [...eintraege.values()]
+	for (const [klasse, { ziel, datei, exportName, typ }] of Object.entries(DATEIEN)) {
+		const gruppe = [...kataloge[gruppeVon(klasse)].values()]
 			.filter(eintrag => eintrag.klasse === klasse)
 			.sort((a, b) => a.id.localeCompare(b.id, 'de'));
-		writeFileSync(`${ZIEL}/${datei}`, renderModule(exportName, gruppe), 'utf8');
+		writeFileSync(`${ziel}/${datei}`, renderModule(exportName, gruppe, typ), 'utf8');
 		console.log(`${datei}: ${gruppe.length} Einträge`);
 	}
 }
