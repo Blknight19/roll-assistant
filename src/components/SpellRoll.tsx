@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { nanoid } from '@reduxjs/toolkit';
 import { roll3D20 } from '@/utils/dice';
-import { canSustain, evaluateTalentCheck, spellAspCost, upkeepModifier } from '@/utils/rules';
+import { canSustain, castingCost, evaluateTalentCheck, upkeepModifier } from '@/utils/rules';
 import { signedModifier } from '@/utils/format';
 import RollBar from './RollBar';
 import CheckResultCard, { checkSummary } from './CheckResultCard';
@@ -86,7 +86,7 @@ const SpellRoll = () => {
 		const dice = roll3D20();
 		const attrs = entries.map(entry => entry.value) as [number, number, number];
 		const result = evaluateTalentCheck(attrs, spell.value, totalModifier, dice);
-		const aspSpent = spellAspCost(spell.cost, result);
+		const aspSpent = castingCost(spell.cost, result);
 
 		const snapshot: SpellRollSnapshot = {
 			spellId: spell.id,

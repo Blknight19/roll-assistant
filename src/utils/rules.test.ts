@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
   canSustain,
+  castingCost,
   evaluateCombatRoll,
   evaluateTalentCheck,
-  spellAspCost,
-  upkeepModifier
+  upkeepModifier,
+  withBonusFp
 } from './rules';
 
 describe('evaluateTalentCheck', () => {
@@ -165,7 +166,7 @@ describe('evaluateCombatRoll', () => {
   });
 });
 
-describe('spellAspCost', () => {
+describe('castingCost', () => {
   // Hilfswürfe: [10,10,10] bei Eigenschaften 15 gelingt, [20,20,5] ist ein Patzer.
   const erfolg = () => evaluateTalentCheck([15, 15, 15], 10, 0, [10, 10, 10]);
   const misserfolg = () => evaluateTalentCheck([10, 10, 10], 0, 0, [18, 18, 10]);
@@ -173,33 +174,33 @@ describe('spellAspCost', () => {
   const patzer = () => evaluateTalentCheck([15, 15, 15], 10, 0, [20, 20, 10]);
 
   it('bucht bei Erfolg die vollen Kosten', () => {
-    expect(spellAspCost(8, erfolg())).toBe(8);
+    expect(castingCost(8, erfolg())).toBe(8);
   });
 
   it('bucht bei Misserfolg die halben Kosten', () => {
-    expect(spellAspCost(8, misserfolg())).toBe(4);
+    expect(castingCost(8, misserfolg())).toBe(4);
   });
 
   it('rundet halbe Kosten auf', () => {
-    expect(spellAspCost(7, misserfolg())).toBe(4);
-    expect(spellAspCost(1, misserfolg())).toBe(1);
+    expect(castingCost(7, misserfolg())).toBe(4);
+    expect(castingCost(1, misserfolg())).toBe(1);
   });
 
   it('bucht beim kritischen Erfolg die halben Kosten', () => {
-    expect(spellAspCost(8, krit())).toBe(4);
+    expect(castingCost(8, krit())).toBe(4);
   });
 
   it('bucht beim Patzer die halben Kosten', () => {
-    expect(spellAspCost(8, patzer())).toBe(4);
+    expect(castingCost(8, patzer())).toBe(4);
   });
 
   it('bleibt bei Kosten 0 bei 0', () => {
-    expect(spellAspCost(0, erfolg())).toBe(0);
-    expect(spellAspCost(0, misserfolg())).toBe(0);
+    expect(castingCost(0, erfolg())).toBe(0);
+    expect(castingCost(0, misserfolg())).toBe(0);
   });
 
   it('behandelt negative Kosten wie 0', () => {
-    expect(spellAspCost(-5, erfolg())).toBe(0);
+    expect(castingCost(-5, erfolg())).toBe(0);
   });
 });
 
@@ -246,5 +247,49 @@ describe('canSustain', () => {
 
   it('lässt einen leeren String nicht durch – eine Angabe ist da, sie sagt nur nichts', () => {
     expect(canSustain('')).toBe(false);
+  });
+});
+
+describe('evaluateTalentCheck mit ignoreFumble', () => {
+  it('zählt zwei Zwanzigen ohne die Option als Patzer', () => {
+    const r = evaluateTalentCheck([15, 15, 15], 12, 0, [20, 20, 5]);
+    expect(r.special).toBe('patzer');
+    expect(r.success).toBe(false);
+  });
+
+  it('rechnet zwei Zwanzigen mit der Option wie gewöhnliche Würfel', () => {
+    const r = evaluateTalentCheck([15, 15, 15], 12, 0, [20, 20, 5], { ignoreFumble: true });
+    expect(r.special).toBeNull();
+    expect(r.perDieShortfall).toEqual([-5, -5, 0]);
+    expect(r.fp).toBe(2);
+    expect(r.success).toBe(true);
+  });
+
+  it('lässt zwei Einsen von der Option unberührt', () => {
+    const r = evaluateTalentCheck([15, 15, 15], 12, 0, [1, 1, 20], { ignoreFumble: true });
+    expect(r.special).toBe('krit');
+  });
+});
+
+describe('withBonusFp', () => {
+  it('hebt FP und QS an', () => {
+    const base = evaluateTalentCheck([15, 15, 15], 5, 0, [10, 10, 10]);
+    expect(base.qs).toBe(2);
+    const boosted = withBonusFp(base, 4);
+    expect(boosted.fp).toBe(9);
+    expect(boosted.qs).toBe(3);
+  });
+
+  it('deckelt die QS weiter bei 6', () => {
+    const base = evaluateTalentCheck([15, 15, 15], 16, 0, [10, 10, 10]);
+    expect(withBonusFp(base, 6).qs).toBe(6);
+  });
+
+  it('lässt Würfel, Ausgang und Sonderfall unverändert', () => {
+    const base = evaluateTalentCheck([15, 15, 15], 5, 0, [1, 1, 10]);
+    const boosted = withBonusFp(base, 3);
+    expect(boosted.dice).toEqual(base.dice);
+    expect(boosted.special).toBe('krit');
+    expect(boosted.success).toBe(true);
   });
 });
