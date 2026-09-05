@@ -85,7 +85,7 @@ Auslesen `waitForTimeout(800)`.
 2. TaW 20, Würfe klein → QS-Hero zeigt 6 (Cap), nicht 7
 3. Nach Wurf Modifikator ändern → Berechnung/QS unverändert (Snapshot)
 4. Kampf: d20=1 + Bestätigung ≤/> Zielwert → Krit vs. "Gelungen (Krit nicht bestätigt)"
-5. Legacy-Blob seeden → Talente/Attribute migriert, Blob wird als v4 zurückgeschrieben
+5. Legacy-Blob seeden → Talente/Attribute migriert, Blob wird als v5 zurückgeschrieben
 6. `navigator.serviceWorker.ready` abwarten → `context.setOffline(true)` → Reload rendert
 7. Liturgie mit „Ohne Gebet" → Gesamt −2 im Rechenweg
 8. Zeremonie: „Namenlose Tage" dann „Feiertag" → nur der Feiertag bleibt (Zeit ist
