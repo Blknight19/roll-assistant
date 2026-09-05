@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ConfirmDialog from './ConfirmDialog';
-import { Trash2, Dices, Swords, Scroll, Wand2, type LucideIcon } from 'lucide-react';
+import { Trash2, Dices, Swords, Scroll, Wand2, Church, type LucideIcon } from 'lucide-react';
 
 /**
  * Icon, Farbe und Zählername je Wurfart – an einer Stelle, damit eine neue Art nicht
@@ -27,6 +27,11 @@ const ROLL_TYPE_STYLES = {
 		icon: Wand2,
 		color: 'text-magic-dark dark:text-magic-light',
 		plural: 'Zauber'
+	},
+	Liturgie: {
+		icon: Church,
+		color: 'text-karma-dark dark:text-karma-light',
+		plural: 'Liturgien'
 	},
 	Einzel: {
 		icon: Dices,
@@ -58,14 +63,17 @@ const RollHistory = () => {
 	const dispatch = useDispatch();
 	const rollHistory: RollHistoryEntry[] = useSelector((state: RootState) => state.roll.history);
 	const isSpellcaster = useSelector((state: RootState) => state.spellbook.isSpellcaster);
+	const isBlessed = useSelector((state: RootState) => state.karma.isBlessed);
 	const [confirmOpen, setConfirmOpen] = useState(false);
 
 	const countOf = (type: RollType) => rollHistory.filter(entry => entry.type === type).length;
 
-	// „Zauber" erscheint für Zauberkundige – und auch sonst, solange noch Zauberwürfe
-	// in der Historie stehen (der Schalter versteckt nur, er löscht nichts).
-	const shownTypes = ROLL_TYPE_ORDER.filter(
-		type => type !== 'Zauber' || isSpellcaster || countOf('Zauber') > 0
+	// „Zauber" und „Liturgie" erscheinen für die jeweilige Fähigkeit – und auch sonst,
+	// solange noch solche Würfe in der Historie stehen (der Schalter versteckt nur,
+	// er löscht nichts).
+	const shownTypes = ROLL_TYPE_ORDER.filter(type =>
+		(type !== 'Zauber' || isSpellcaster || countOf('Zauber') > 0) &&
+		(type !== 'Liturgie' || isBlessed || countOf('Liturgie') > 0)
 	);
 
 	return (
@@ -155,9 +163,12 @@ const RollHistory = () => {
 												</span>
 											</div>
 											<p className="text-sm">{roll.result}</p>
-											<p className="text-xs text-muted-foreground mt-1">
-												Würfel: {roll.values.join(', ')}
-											</p>
+											{/* Ein Segen wird ohne Probe gewirkt und hat keine Würfel. */}
+											{roll.values.length > 0 && (
+												<p className="text-xs text-muted-foreground mt-1">
+													Würfel: {roll.values.join(', ')}
+												</p>
+											)}
 										</div>
 									</div>
 								</div>

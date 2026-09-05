@@ -5,7 +5,7 @@ export const HISTORY_LIMIT = 100;
 
 export type RollHistoryEntry = {
 	id: string,
-	type: 'Einzel' | 'Talent' | 'Kampf' | 'Zauber',
+	type: 'Einzel' | 'Talent' | 'Kampf' | 'Zauber' | 'Liturgie',
 	values: number[],
 	result: string,
 	date: string
