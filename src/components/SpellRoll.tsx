@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { nanoid } from '@reduxjs/toolkit';
 import { roll3D20 } from '@/utils/dice';
-import { canSustain, castingCost, evaluateTalentCheck, upkeepModifier } from '@/utils/rules';
+import { canSustain, castingCost, evaluateTalentCheck } from '@/utils/rules';
 import { signedModifier } from '@/utils/format';
 import RollBar from './RollBar';
 import CheckResultCard, { checkSummary } from './CheckResultCard';
 import PropertyNumber from './PropertyNumber';
 import ResourceBar from './ResourceBar';
+import SustainedEffects from './SustainedEffects';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -15,7 +16,7 @@ import {
 } from '@/components/ui/command';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { addRoll } from '@/store/rollSlice';
-import { ASP_MAX, addUpkeep, changeAsp, removeUpkeep, setAsp } from '@/store/spellbookSlice';
+import { ASP_MAX, addUpkeep, changeAsp, setAsp } from '@/store/spellbookSlice';
 import {
 	markLastRollRefunded,
 	selectSpell,
@@ -25,7 +26,8 @@ import {
 } from '@/store/spellRollSlice';
 import type { RootState } from '@/store';
 import { useResultScroll } from '@/hooks/useResultScroll';
-import { ChevronDown, Hourglass, Info, RotateCcw, Sparkle, StickyNote, Timer, Wand2, X } from 'lucide-react';
+import { useSustained } from '@/hooks/useSustained';
+import { ChevronDown, Hourglass, Info, RotateCcw, Sparkle, StickyNote, Timer, Wand2 } from 'lucide-react';
 
 /** Begründung der Buchung – die halbe Zahl allein wirkt sonst wie ein Fehler. */
 const costNote = (roll: SpellRollSnapshot): string => {
@@ -51,6 +53,7 @@ const SpellRoll = () => {
 	const attributes = useSelector((state: RootState) => state.attributes);
 	const { spells, asp, upkeep } = useSelector((state: RootState) => state.spellbook);
 	const spellRoll = useSelector((state: RootState) => state.spellRoll);
+	const sustained = useSustained();
 
 	const [pickerOpen, setPickerOpen] = useState(false);
 
@@ -69,7 +72,7 @@ const SpellRoll = () => {
 	const cost = spell?.cost ?? 0;
 
 	const lastRoll = spellRoll.lastRoll;
-	const auto = upkeepModifier(upkeep.length);
+	const auto = sustained.modifier;
 	const totalModifier = spellRoll.modifier + auto;
 	const canAfford = cost <= asp.current;
 	const ready = spell !== undefined && canAfford;
@@ -300,38 +303,7 @@ const SpellRoll = () => {
 				</CardContent>
 			</Card>
 
-			{upkeep.length > 0 && (
-				<Card variant="parchment">
-					<CardHeader className="pb-3">
-						<CardTitle className="flex items-center gap-2 text-lg">
-							<Timer className="h-5 w-5 text-magic-dark dark:text-magic-light" />
-							Laufende Zauber
-						</CardTitle>
-					</CardHeader>
-					<CardContent className="space-y-2">
-						{upkeep.map(entry => (
-							<div
-								key={entry.id}
-								className="flex items-center gap-3 rounded-lg bg-aventurian-100/50 px-3 py-2 dark:bg-aventurian-800/50"
-							>
-								<span className="min-w-0 flex-1 truncate font-heading text-sm">{entry.spellName}</span>
-								<span className="whitespace-nowrap text-xs text-muted-foreground">QS {entry.qs}</span>
-								<Button
-									variant="ghost"
-									size="icon"
-									onClick={() => dispatch(removeUpkeep(entry.id))}
-									aria-label={`${entry.spellName} beenden`}
-								>
-									<X className="h-4 w-4" />
-								</Button>
-							</div>
-						))}
-						<p className="pt-1 text-xs text-muted-foreground">
-							Jeder laufende Zauber erschwert weitere Zauberproben um 1.
-						</p>
-					</CardContent>
-				</Card>
-			)}
+			<SustainedEffects />
 		</>
 	);
 
@@ -388,9 +360,7 @@ const SpellRoll = () => {
 				: `Nicht genug AsP: ${cost} nötig, ${asp.current} vorhanden.`}
 			label="Zaubern"
 			autoModifier={auto}
-			autoNote={upkeep.length > 0
-				? `${auto} durch ${upkeep.length} ${upkeep.length === 1 ? 'laufenden Zauber' : 'laufende Zauber'}`
-				: undefined}
+			autoNote={sustained.note}
 		/>
 	);
 
