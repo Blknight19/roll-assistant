@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '@/store';
 import { removeKarmaUpkeep } from '@/store/karmaSlice';
 import { removeUpkeep } from '@/store/spellbookSlice';
+import { signedModifier } from '@/utils/format';
 import { upkeepModifier } from '@/utils/rules';
 
 export type SustainedEntry = {
@@ -39,7 +40,7 @@ export const useSustained = () => {
 	const count = entries.length;
 	const modifier = upkeepModifier(count);
 	const note = count > 0
-		? `${modifier} durch ${count} ${count === 1 ? 'laufenden Effekt' : 'laufende Effekte'}`
+		? `${signedModifier(modifier)} durch ${count} ${count === 1 ? 'laufenden Effekt' : 'laufende Effekte'}`
 		: undefined;
 
 	const end = (entry: SustainedEntry) => {

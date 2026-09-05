@@ -1,5 +1,6 @@
 import { useId } from 'react';
 import ModifierControl from './ModifierControl';
+import { signedModifier } from '@/utils/format';
 import { Button } from '@/components/ui/button';
 import { Dices } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -94,7 +95,7 @@ const RollBar = ({
 
 			{autoModifier !== 0 && (
 				<p className="mx-auto mt-2 max-w-3xl text-center text-xs text-muted-foreground">
-					Gesamt {total >= 0 ? `+${total}` : total}
+					Gesamt {signedModifier(total)}
 					{autoNote && <> – {autoNote}</>}
 				</p>
 			)}
