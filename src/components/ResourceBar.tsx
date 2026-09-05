@@ -4,8 +4,8 @@ type ResourceBarProps = {
 	label: string;
 	current: number;
 	max: number;
-	/** LeP zeigen Schmerzstufen als Ampel; AsP haben kein Gegenstück. */
-	tone: 'life' | 'astral';
+	/** LeP zeigen Schmerzstufen als Ampel; AsP und KaP haben kein Gegenstück. */
+	tone: 'life' | 'astral' | 'karma';
 	className?: string;
 };
 
@@ -15,7 +15,9 @@ const ResourceBar = ({ label, current, max, tone, className = '' }: ResourceBarP
 	const width = fillPercent(current, max);
 	const fill = tone === 'astral'
 		? 'bg-magic'
-		: ratio > 66 ? 'bg-success' : ratio > 33 ? 'bg-amber-500' : 'bg-failure';
+		: tone === 'karma'
+			? 'bg-karma'
+			: ratio > 66 ? 'bg-success' : ratio > 33 ? 'bg-amber-500' : 'bg-failure';
 
 	return (
 		<div className="flex items-center gap-2">

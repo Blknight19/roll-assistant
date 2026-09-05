@@ -38,6 +38,14 @@ export default {
           light: '#a78bfa',
           dark: '#6d28d9',
         },
+
+        // Karma-Farben – himmelblau, die einzige freie Hue-Familie neben Bronze,
+        // Violett und dem Krit-Bernstein
+        karma: {
+          DEFAULT: '#4f83cc',
+          light: '#8fb3e8',
+          dark: '#2f5da8',
+        },
         
         // Erfolg/Fehler einheitlich
         success: {
