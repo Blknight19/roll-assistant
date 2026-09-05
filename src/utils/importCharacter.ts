@@ -10,7 +10,8 @@ import {
 } from '@/store/persistence';
 import { setCharacterName } from '@/store/profileSlice';
 import { setHistory } from '@/store/rollSlice';
-import { setConfirmCriticals } from '@/store/settingsSlice';
+import { setConfirmCriticals, setNoLiturgyFumble } from '@/store/settingsSlice';
+import { setKarma } from '@/store/karmaSlice';
 import { setSpellbook } from '@/store/spellbookSlice';
 import { updateTalent } from '@/store/talentsSlice';
 
@@ -67,8 +68,10 @@ export const importCharacter = async (file: File): Promise<boolean> => {
 	}
 	dispatch(updateLifeStat(imported.combat.life));
 	dispatch(setSpellbook(imported.spellbook));
+	dispatch(setKarma(imported.karma));
 	dispatch(setHistory(imported.roll.history));
 	dispatch(setConfirmCriticals(imported.settings.confirmCriticals));
+	dispatch(setNoLiturgyFumble(imported.settings.noLiturgyFumble));
 
 	toast.success('Import erfolgreich');
 	return true;

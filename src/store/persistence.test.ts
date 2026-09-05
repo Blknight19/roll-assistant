@@ -4,9 +4,11 @@ import {
 	PERSISTED_VERSION,
 	migratePersisted,
 	sanitizeHistory,
+	sanitizeKarma,
 	sanitizeSpellbook,
 	toPersisted
 } from './persistence';
+import { initialKarmaState } from './karmaSlice';
 import { initialTalentState } from './talentsSlice';
 import { initialSettingsState } from './settingsSlice';
 import { HISTORY_LIMIT, type RollHistoryEntry } from './rollSlice';
@@ -486,5 +488,99 @@ describe('Zauberdauer im Zauberbuch', () => {
 			}]
 		});
 		expect(state!.spellbook.spells[0].castTime).toBeUndefined();
+	});
+});
+
+describe('sanitizeKarma', () => {
+	it('liefert ein leeres Buch, wenn das Feld fehlt (Migration v4 auf v5)', () => {
+		const state = migratePersisted({
+			version: 4,
+			activeCharacterId: 'held-1',
+			characters: [{ id: 'held-1', name: 'A' }]
+		});
+		expect(state!.karma).toEqual(initialKarmaState);
+	});
+
+	it('übernimmt isBlessed nur als echten Boolean', () => {
+		expect(sanitizeKarma({ isBlessed: 'ja' }).isBlessed).toBe(false);
+		expect(sanitizeKarma({ isBlessed: true }).isBlessed).toBe(true);
+	});
+
+	it('verwirft Einträge mit unbekannter Eigenschaft oder Gattung', () => {
+		const karma = sanitizeKarma({
+			liturgies: [
+				{ id: 'a', klasse: 'liturgie', name: 'Ok', attributes: ['MU', 'KL', 'IN'], cost: 8, value: 4 },
+				{ id: 'b', klasse: 'liturgie', name: 'Kaputt', attributes: ['MU', 'XX', 'IN'], cost: 8, value: 4 },
+				{ id: 'c', klasse: 'segen', name: 'Falsche Gattung', attributes: ['MU', 'KL', 'IN'], cost: 1, value: 0 }
+			]
+		});
+		expect(karma.liturgies.map(l => l.id)).toEqual(['a']);
+	});
+
+	it('lässt Zeremonien mit 256 KaP durch und kappt darüber', () => {
+		const karma = sanitizeKarma({
+			liturgies: [
+				{ id: 'a', klasse: 'zeremonie', name: 'Teuer', attributes: ['MU', 'KL', 'IN'], cost: 256, value: 4 },
+				{ id: 'b', klasse: 'zeremonie', name: 'Zu teuer', attributes: ['MU', 'KL', 'IN'], cost: 999, value: 4 }
+			]
+		});
+		expect(karma.liturgies.map(l => l.cost)).toEqual([256, 256]);
+	});
+
+	it('behält nur bekannte Segen', () => {
+		expect(sanitizeKarma({ blessings: ['speisesegen', 'gibtsnicht', 42] }).blessings).toEqual([
+			'speisesegen'
+		]);
+	});
+
+	it('kappt die Tradition und clampt KaP', () => {
+		const karma = sanitizeKarma({ tradition: 'x'.repeat(80), kap: { current: 99, max: 30 } });
+		expect(karma.tradition).toHaveLength(40);
+		expect(karma.kap).toEqual({ current: 30, max: 30 });
+	});
+
+	it('übernimmt laufende Liturgien nur mit gültiger QS', () => {
+		const karma = sanitizeKarma({
+			upkeep: [
+				{ id: 'u1', spellName: 'Magieschutz', qs: 3 },
+				{ id: 'u2', spellName: 'X', qs: 9 }
+			]
+		});
+		expect(karma.upkeep.map(u => u.id)).toEqual(['u1']);
+	});
+
+	it('rettet die Entrückungsstufe und clampt sie', () => {
+		expect(sanitizeKarma({ devotionLevel: 3 }).devotionLevel).toBe(3);
+		expect(sanitizeKarma({ devotionLevel: 99 }).devotionLevel).toBe(4);
+		expect(sanitizeKarma({ devotionLevel: 'viel' }).devotionLevel).toBe(0);
+		expect(sanitizeKarma({}).devotionLevel).toBe(0);
+	});
+
+	it('lässt ein Liturgienbuch mit Inhalt isBlessed false unverändert überleben', () => {
+		const karma = sanitizeKarma({
+			isBlessed: false,
+			liturgies: [
+				{ id: 'a', klasse: 'liturgie', name: 'Ok', attributes: ['MU', 'KL', 'IN'], cost: 8, value: 4 }
+			],
+			kap: { current: 12, max: 30 }
+		});
+		expect(karma.isBlessed).toBe(false);
+		expect(karma.liturgies).toHaveLength(1);
+		expect(karma.kap).toEqual({ current: 12, max: 30 });
+	});
+});
+
+describe('Historie mit Liturgien', () => {
+	it('lässt Einträge vom Typ Liturgie durch, auch ohne Würfel', () => {
+		const entries = sanitizeHistory([{ ...historyEntry('l'), type: 'Liturgie', values: [] }]);
+		expect(entries).toHaveLength(1);
+		expect(entries[0].values).toEqual([]);
+	});
+});
+
+describe('Einstellungen', () => {
+	it('liest noLiturgyFumble nur als Boolean', () => {
+		expect(migratePersisted({ version: 5, settings: { noLiturgyFumble: true } })!.settings.noLiturgyFumble).toBe(true);
+		expect(migratePersisted({ version: 5, settings: { noLiturgyFumble: 'ja' } })!.settings.noLiturgyFumble).toBe(false);
 	});
 });
