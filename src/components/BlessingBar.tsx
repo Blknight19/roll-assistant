@@ -58,18 +58,25 @@ const BlessingBar = () => {
 						Wähle im Charakterbogen unter „Liturgien" die erworbenen Segen.
 					</p>
 				) : (
-					<div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+					<div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+						{/* Eine Spalte auf dem Handy: „Harmoniesegen" ist ein unteilbares Kompositum
+						    und passt in zwei Spalten bei 360 px nicht. Volle Breite gibt dem Knopf
+						    zugleich die bessere Trefferfläche. */}
 						{known.map(entry => (
 							<Button
 								key={entry.id}
 								variant="outline"
-								className="h-auto min-h-11 flex-col items-start gap-0 px-3 py-2 text-left font-body"
+								// `whitespace-normal` hebt das `whitespace-nowrap` der Basisklasse auf:
+								// „Kleiner Schutzsegen" ragte sonst aus dem Knopf heraus.
+								className="h-auto min-h-11 w-full min-w-0 flex-col items-start gap-0 whitespace-normal px-3 py-2 text-left font-body"
 								onClick={canAfford ? () => cast(entry.id, entry.name) : undefined}
 								aria-disabled={!canAfford || undefined}
 								aria-label={`${entry.name} wirken, ${SEGEN_KOSTEN} KaP`}
 							>
-								<span className="font-heading text-sm">{entry.name}</span>
-								<span className="text-xs text-muted-foreground">{entry.duration}</span>
+								<span className="w-full font-heading text-sm leading-tight">{entry.name}</span>
+								<span className="w-full text-xs leading-tight text-muted-foreground">
+									{entry.duration}
+								</span>
 							</Button>
 						))}
 					</div>

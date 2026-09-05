@@ -119,6 +119,45 @@ const LiturgyBook = () => {
 		<div className="space-y-6">
 			<Card variant="parchment">
 				<CardHeader>
+					<CardTitle className="flex items-center gap-2 text-lg">
+						<HeartHandshake className="h-5 w-5 text-karma-dark dark:text-karma-light" />
+						Segen
+					</CardTitle>
+				</CardHeader>
+				<CardContent className="space-y-3">
+					<p className="text-xs text-muted-foreground">
+						Segen werden wie Sonderfertigkeiten erworben (1 AP), kosten 1 KaP, brauchen
+						keine Probe und wirken mit QS 1. Schamanen kennen keine Segen.
+					</p>
+					<div className="grid gap-2 sm:grid-cols-2">
+						{segen.map(entry => {
+							const id = `segen-${entry.id}`;
+							return (
+								<div
+									key={entry.id}
+									className="flex items-center justify-between gap-3 rounded-lg bg-aventurian-100/50 px-3 py-2 dark:bg-aventurian-800/50"
+								>
+									<label htmlFor={id} className="min-w-0">
+										<div className="font-heading text-sm">{entry.name}</div>
+										<div className="truncate text-xs text-muted-foreground">
+											{entry.range} · {entry.duration}
+										</div>
+									</label>
+									<Switch
+										id={id}
+										checked={blessings.includes(entry.id)}
+										onCheckedChange={() => dispatch(toggleBlessing(entry.id))}
+										aria-label={`${entry.name} erworben`}
+									/>
+								</div>
+							);
+						})}
+					</div>
+				</CardContent>
+			</Card>
+
+			<Card variant="parchment">
+				<CardHeader>
 					<CardTitle className="flex items-center gap-2">
 						<Church className="w-6 h-6" />
 						Liturgienbuch
@@ -285,45 +324,6 @@ const LiturgyBook = () => {
 						</div>
 						</>
 					)}
-				</CardContent>
-			</Card>
-
-			<Card variant="parchment">
-				<CardHeader>
-					<CardTitle className="flex items-center gap-2 text-lg">
-						<HeartHandshake className="h-5 w-5 text-karma-dark dark:text-karma-light" />
-						Segen
-					</CardTitle>
-				</CardHeader>
-				<CardContent className="space-y-3">
-					<p className="text-xs text-muted-foreground">
-						Segen werden wie Sonderfertigkeiten erworben (1 AP), kosten 1 KaP, brauchen
-						keine Probe und wirken mit QS 1. Schamanen kennen keine Segen.
-					</p>
-					<div className="grid gap-2 sm:grid-cols-2">
-						{segen.map(entry => {
-							const id = `segen-${entry.id}`;
-							return (
-								<div
-									key={entry.id}
-									className="flex items-center justify-between gap-3 rounded-lg bg-aventurian-100/50 px-3 py-2 dark:bg-aventurian-800/50"
-								>
-									<label htmlFor={id} className="min-w-0">
-										<div className="font-heading text-sm">{entry.name}</div>
-										<div className="truncate text-xs text-muted-foreground">
-											{entry.range} · {entry.duration}
-										</div>
-									</label>
-									<Switch
-										id={id}
-										checked={blessings.includes(entry.id)}
-										onCheckedChange={() => dispatch(toggleBlessing(entry.id))}
-										aria-label={`${entry.name} erworben`}
-									/>
-								</div>
-							);
-						})}
-					</div>
 				</CardContent>
 			</Card>
 
