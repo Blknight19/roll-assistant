@@ -16,6 +16,8 @@ const HeroBar = () => {
 	const life = useSelector((state: RootState) => state.combat.life);
 	const asp = useSelector((state: RootState) => state.spellbook.asp);
 	const isSpellcaster = useSelector((state: RootState) => state.spellbook.isSpellcaster);
+	const kap = useSelector((state: RootState) => state.karma.kap);
+	const isBlessed = useSelector((state: RootState) => state.karma.isBlessed);
 	const [editing, setEditing] = useState(false);
 
 	return (
@@ -53,6 +55,9 @@ const HeroBar = () => {
 				<ResourceBar label="LeP" current={life.current} max={life.max} tone="life" className="w-24 sm:w-36" />
 				{isSpellcaster && (
 					<ResourceBar label="AsP" current={asp.current} max={asp.max} tone="astral" className="w-24 sm:w-36" />
+				)}
+				{isBlessed && (
+					<ResourceBar label="KaP" current={kap.current} max={kap.max} tone="karma" className="w-24 sm:w-36" />
 				)}
 			</div>
 		</div>
