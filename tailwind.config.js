@@ -6,6 +6,18 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+    // Vollständig gesetzt statt über `extend`: ein kleinerer Haltepunkt landet dort am
+    // Ende der Liste, und die Reihenfolge entscheidet, welche Regel gewinnt.
+    // `xs` liegt bei 420 px, weil eine Kampfwert-Kachel 160 px braucht und zwei Spalten
+    // damit erst ab 412 px Fensterbreite passen.
+    screens: {
+      xs: '420px',
+      sm: '640px',
+      md: '768px',
+      lg: '1024px',
+      xl: '1280px',
+      '2xl': '1536px',
+    },
     extend: {
       fontFamily: {
         heading: ['Cinzel', 'serif'],

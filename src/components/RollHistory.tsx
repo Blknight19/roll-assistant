@@ -81,7 +81,9 @@ const RollHistory = () => {
 			{/* Header */}
 			<Card variant="parchment">
 				<CardHeader>
-					<div className="flex justify-between items-center">
+					{/* Titel und Knopf brauchen zusammen 247 px und passen unter 400 px nicht
+					    nebeneinander – dann rutscht der Knopf unter den Titel. */}
+					<div className="flex flex-wrap justify-between items-center gap-2">
 						<CardTitle className="flex items-center gap-2">
 							<Scroll className="w-6 h-6" />
 							Wurf-Historie

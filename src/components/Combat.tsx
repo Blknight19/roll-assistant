@@ -209,11 +209,12 @@ const Combat = () => {
 					<CardTitle className="text-lg">Kampfwerte</CardTitle>
 				</CardHeader>
 				<CardContent>
-					{/* Drei Spalten nur, solange die Karte die volle Breite hat. Im
-					    Desktop-Layout steht sie in einer halbbreiten Spalte – dort passen
-					    drei Stepper (je 160 px) nicht mehr in die Zellen und ragen über
-					    deren Hintergrund hinaus. */}
-					<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-2">
+					{/* Eine Kachel braucht 160 px (zwei 44-px-Knöpfe, ein 64-px-Feld, zwei
+					    Lücken), zwei Spalten also 412 px Fensterbreite – darunter eine Spalte.
+					    Drei Spalten nur, solange die Karte die volle Breite hat: im
+					    Desktop-Layout steht sie in einer halbbreiten Spalte, dort passen drei
+					    Stepper nicht mehr in die Zellen und ragen über deren Hintergrund hinaus. */}
+					<div className="grid grid-cols-1 gap-3 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-2">
 						{combatStats.map(({ type, key }) => {
 							const Icon = combatIcons[type];
 							return (
