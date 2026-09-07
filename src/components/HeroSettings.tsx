@@ -88,6 +88,14 @@ const HeroSettings = () => {
 							</SelectTrigger>
 							<SelectContent>
 								<SelectItem value={ANDERE} className="font-body">Andere / keine</SelectItem>
+								{/* Eine Tradition aus einer importierten Datei muss der Katalog nicht
+								    kennen. Ohne eigenen Eintrag stünde das Feld leer da, obwohl ein
+								    Wert gesetzt ist – der Spieler sähe nicht, was sein Held ist. */}
+								{tradition !== '' && !TRADITIONEN.includes(tradition) && (
+									<SelectItem value={tradition} className="font-body">
+										{tradition} (unbekannt)
+									</SelectItem>
+								)}
 								{TRADITIONEN.map(name => (
 									<SelectItem key={name} value={name} className="font-body">{name}</SelectItem>
 								))}
