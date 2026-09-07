@@ -13,6 +13,7 @@ import {
 } from './spellbookSlice';
 import { clampTalentValue } from './talentsSlice';
 import { clampDevotionLevel } from '@/data/liturgies/devotion';
+import { stripControlChars } from '@/utils/text';
 
 /** Segen stehen nicht im Buch – sie sind eine geschlossene Liste und nur als Katalog-ID erworben. */
 export type LiturgyBookClass = 'liturgie' | 'zeremonie';
@@ -81,7 +82,7 @@ export const clampKapCost = (value: number): number =>
 	Math.min(LITURGY_COST_MAX, Math.max(0, Math.round(value)));
 
 export const sanitizeTradition = (name: string): string =>
-	name.replace(/\s+/g, ' ').trim().slice(0, TRADITION_MAX);
+	stripControlChars(name).replace(/\s+/g, ' ').trim().slice(0, TRADITION_MAX);
 
 const normalizeLiturgy = (entry: Liturgy): Liturgy => ({
 	...entry,

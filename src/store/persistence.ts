@@ -49,6 +49,7 @@ import { clampTalentValue, initialTalentState, type Talent, type TalentState } f
 import { SPELL_CATALOG } from '@/data/spells';
 import { LITURGY_CATALOG } from '@/data/liturgies';
 import { clampDevotionLevel } from '@/data/liturgies/devotion';
+import { stripControlChars } from '@/utils/text';
 
 const STORAGE_KEY = 'dsa-app-state';
 
@@ -162,7 +163,15 @@ export const sanitizeHistory = (raw: unknown): RollHistoryEntry[] => {
 			entry.values.length <= ROLL_VALUES_MAX &&
 			entry.values.every(value => isFiniteNumber(value)))
 		.slice(0, HISTORY_LIMIT)
-		.map(entry => ({ ...entry, result: entry.result.slice(0, HISTORY_RESULT_MAX) }));
+		// Feldweise neu aufgebaut: ein Spread schleppte unbekannte Schlüssel der Datei in
+		// den Store und beim nächsten Export wieder hinaus.
+		.map(entry => ({
+			id: entry.id,
+			type: entry.type,
+			values: [...entry.values],
+			result: stripControlChars(entry.result).slice(0, HISTORY_RESULT_MAX),
+			date: entry.date
+		}));
 };
 
 export const sanitizeSettings = (raw: unknown): SettingsState => {
@@ -229,7 +238,7 @@ export const sanitizeSpellbook = (raw: unknown): SpellbookState => {
 				isFiniteNumber(entry.qs) &&
 				entry.qs >= 1 && entry.qs <= 6)
 			.slice(0, SPELL_LIMIT)
-			.map(entry => ({ ...entry, spellName: sanitizeSpellName(entry.spellName) }))
+			.map(entry => ({ id: entry.id, spellName: sanitizeSpellName(entry.spellName), qs: entry.qs }))
 		: [];
 
 	// Bewusst nur `clampAsp`, ohne die Ersteinrichtungs-Auffüllung von `setAsp`: eine
@@ -312,7 +321,7 @@ export const sanitizeKarma = (raw: unknown): KarmaState => {
 				isFiniteNumber(entry.qs) &&
 				entry.qs >= 1 && entry.qs <= 6)
 			.slice(0, LITURGY_LIMIT)
-			.map(entry => ({ ...entry, spellName: sanitizeSpellName(entry.spellName) }))
+			.map(entry => ({ id: entry.id, spellName: sanitizeSpellName(entry.spellName), qs: entry.qs }))
 		: [];
 
 	const kap = isRecord(raw.kap)

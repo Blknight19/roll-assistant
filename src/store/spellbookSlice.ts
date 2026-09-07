@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type { AttributeKey } from './attributesSlice';
 import { clampTalentValue } from './talentsSlice';
+import { stripControlChars } from '@/utils/text';
 
 /** Ein Zauber im Zauberbuch des Helden. Katalogeinträge werden hier hinein kopiert. */
 export type Spell = {
@@ -77,7 +78,7 @@ export const clampAsp = ({ current, max }: AspState): AspState => {
 };
 
 export const sanitizeSpellName = (name: string): string =>
-	name.replace(/\s+/g, ' ').trimStart().slice(0, SPELL_NAME_MAX);
+	stripControlChars(name).replace(/\s+/g, ' ').trimStart().slice(0, SPELL_NAME_MAX);
 
 export const clampSpellCost = (value: number): number =>
 	Math.min(SPELL_COST_MAX, Math.max(0, Math.round(value)));
@@ -87,7 +88,7 @@ export const clampSpellCost = (value: number): number =>
  * Import dieselbe Funktion benutzen kann: alles, was kein String ist, entfällt.
  */
 export const clampSpellText = (value: unknown, max: number): string | undefined =>
-	typeof value === 'string' ? value.slice(0, max) : undefined;
+	typeof value === 'string' ? stripControlChars(value).slice(0, max) : undefined;
 
 const normalizeSpell = (spell: Spell): Spell => ({
 	...spell,

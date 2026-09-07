@@ -584,3 +584,34 @@ describe('Einstellungen', () => {
 		expect(migratePersisted({ version: 5, settings: { noLiturgyFumble: 'ja' } })!.settings.noLiturgyFumble).toBe(false);
 	});
 });
+
+describe('Sanitizer bauen Objekte feldweise auf', () => {
+	// Ein Spread schleppte unbekannte Schlüssel aus der Datei in den Store – und beim
+	// nächsten Export wieder hinaus.
+	const fremd = { boesartig: 'nutzlast' };
+
+	it('verwirft fremde Schlüssel in laufenden Liturgien', () => {
+		const karma = sanitizeKarma({ upkeep: [{ id: 'u1', spellName: 'X', qs: 3, ...fremd }] });
+		expect(Object.keys(karma.upkeep[0])).toEqual(['id', 'spellName', 'qs']);
+	});
+
+	it('verwirft fremde Schlüssel in laufenden Zaubern', () => {
+		const book = sanitizeSpellbook({ upkeep: [{ id: 'u1', spellName: 'X', qs: 3, ...fremd }] });
+		expect(Object.keys(book.upkeep[0])).toEqual(['id', 'spellName', 'qs']);
+	});
+
+	it('verwirft fremde Schlüssel in der Historie', () => {
+		const entries = sanitizeHistory([{ ...historyEntry('a'), ...fremd }]);
+		expect(Object.keys(entries[0]).sort()).toEqual(['date', 'id', 'result', 'type', 'values']);
+	});
+
+	it('verwirft fremde Schlüssel in Liturgien des Buchs', () => {
+		const karma = sanitizeKarma({
+			liturgies: [{
+				id: 'l1', klasse: 'liturgie', name: 'Wahrheit',
+				attributes: ['MU', 'KL', 'IN'], cost: 8, value: 4, ...fremd
+			}]
+		});
+		expect(Object.keys(karma.liturgies[0])).not.toContain('boesartig');
+	});
+});
