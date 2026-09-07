@@ -53,7 +53,9 @@ const HeroBar = () => {
 				</button>
 			)}
 
-			<div className="ml-auto flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-4">
+			{/* `flex-wrap` ab `sm`: drei Leisten und das Entrückungsabzeichen passen auf
+			    mittleren Breiten nicht mehr in eine Zeile neben den Heldennamen. */}
+			<div className="ml-auto flex flex-col items-end gap-1 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end sm:gap-x-4 sm:gap-y-1">
 				<ResourceBar label="LeP" current={life.current} max={life.max} tone="life" className="w-24 sm:w-36" />
 				{isSpellcaster && (
 					<ResourceBar label="AsP" current={asp.current} max={asp.max} tone="astral" className="w-24 sm:w-36" />

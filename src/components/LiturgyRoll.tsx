@@ -329,7 +329,7 @@ const LiturgyRoll = () => {
 						</Button>
 					</div>
 
-					<div className="flex items-center justify-center gap-3">
+					<div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
 						<PropertyNumber
 							label="Aktuell"
 							value={kap.current}

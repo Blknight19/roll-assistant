@@ -129,7 +129,9 @@ const LiturgyBook = () => {
 						Segen werden wie Sonderfertigkeiten erworben (1 AP), kosten 1 KaP, brauchen
 						keine Probe und wirken mit QS 1. Schamanen kennen keine Segen.
 					</p>
-					<div className="grid gap-2 sm:grid-cols-2">
+					{/* `grid-cols-1` statt eines bloßen `grid`: die implizite Spur wird sonst
+					    auf den breitesten Eintrag bemessen und sprengt die Karte. */}
+					<div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
 						{segen.map(entry => {
 							const id = `segen-${entry.id}`;
 							return (
@@ -137,14 +139,18 @@ const LiturgyBook = () => {
 									key={entry.id}
 									className="flex items-center justify-between gap-3 rounded-lg bg-aventurian-100/50 px-3 py-2 dark:bg-aventurian-800/50"
 								>
-									<label htmlFor={id} className="min-w-0">
-										<div className="font-heading text-sm">{entry.name}</div>
+									{/* `flex-1` neben `min-w-0`: ohne beides bestimmt der längste Untertext
+									    („in Zwölfgötterkirchen bis zum 12. Lebensjahr") die Zeilenbreite
+									    und schiebt die Karte aus dem Bild. */}
+									<label htmlFor={id} className="min-w-0 flex-1">
+										<div className="truncate font-heading text-sm">{entry.name}</div>
 										<div className="truncate text-xs text-muted-foreground">
 											{entry.range} · {entry.duration}
 										</div>
 									</label>
 									<Switch
 										id={id}
+										className="shrink-0"
 										checked={blessings.includes(entry.id)}
 										onCheckedChange={() => dispatch(toggleBlessing(entry.id))}
 										aria-label={`${entry.name} erworben`}
