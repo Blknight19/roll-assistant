@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { evaluateTalentCheck } from '@/utils/rules';
+import { setTradition } from './karmaSlice';
 import {
 	applyCritBonus,
 	liturgyRollReducer,
@@ -7,6 +8,7 @@ import {
 	markLiturgyRefunded,
 	selectLiturgy,
 	setLastBlessing,
+	setCatalogTradition,
 	setLiturgyLastRoll,
 	toggleLiturgyCircumstance,
 	type LiturgyRoll
@@ -78,5 +80,22 @@ describe('liturgyRollReducer', () => {
 		});
 		state = liturgyRollReducer(state, markBlessingRefunded());
 		expect(state.lastBlessing!.booked).toBe(false);
+	});
+});
+
+describe('Katalogfilter', () => {
+	it('folgt ohne eigene Wahl der Tradition des Helden', () => {
+		expect(initial.catalogTradition).toBeNull();
+	});
+
+	it('merkt sich eine eigene Wahl', () => {
+		const state = liturgyRollReducer(initial, setCatalogTradition('alle'));
+		expect(state.catalogTradition).toBe('alle');
+	});
+
+	it('gibt die eigene Wahl auf, sobald die Tradition wechselt', () => {
+		let state = liturgyRollReducer(initial, setCatalogTradition('alle'));
+		state = liturgyRollReducer(state, setTradition('Rondra'));
+		expect(state.catalogTradition).toBeNull();
 	});
 });

@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type { AttributeKey } from './attributesSlice';
-import type { LiturgyBookClass } from './karmaSlice';
+import { setTradition, type LiturgyBookClass } from './karmaSlice';
 import { CIRCUMSTANCES, toggleCircumstance } from '@/data/liturgies/circumstances';
 import { withBonusFp, type TalentCheckResult } from '@/utils/rules';
 
@@ -40,6 +40,13 @@ export type LiturgyRollState = {
 	/** Ob die KaP des letzten Wurfs noch gebucht sind – schaltet den Rückgängig-Knopf. */
 	lastRollBooked: boolean;
 	lastBlessing: BlessingCast | null;
+	/**
+	 * Traditionsfilter des Katalogs, `null` solange niemand ihn von Hand gesetzt hat –
+	 * dann zeigt das Liturgienbuch die Tradition des Helden. Bewusst hier und nicht als
+	 * Komponentenzustand: der Tab hängt das Buch beim Wechsel ab, eine Auswahl im Buch
+	 * soll das überleben.
+	 */
+	catalogTradition: string | null;
 };
 
 const initialState: LiturgyRollState = {
@@ -48,7 +55,8 @@ const initialState: LiturgyRollState = {
 	circumstances: [],
 	lastRoll: null,
 	lastRollBooked: false,
-	lastBlessing: null
+	lastBlessing: null,
+	catalogTradition: null
 };
 
 /** Ort, Zeit und Gegenstand beschreiben die Szene und bleiben; Technik und Modifikationen hängen am Eintrag. */
@@ -93,7 +101,17 @@ const liturgyRollSlice = createSlice({
 		},
 		markBlessingRefunded: (state) => {
 			if (state.lastBlessing) state.lastBlessing.booked = false;
+		},
+		setCatalogTradition: (state, action: PayloadAction<string>) => {
+			state.catalogTradition = action.payload;
 		}
+	},
+	extraReducers: (builder) => {
+		// Eine neue Tradition schlägt die Handauswahl: der Katalog zeigt wieder das,
+		// was der Held wirken darf.
+		builder.addCase(setTradition, (state) => {
+			state.catalogTradition = null;
+		});
 	}
 });
 
@@ -105,6 +123,7 @@ export const {
 	markLiturgyRefunded,
 	applyCritBonus,
 	setLastBlessing,
-	markBlessingRefunded
+	markBlessingRefunded,
+	setCatalogTradition
 } = liturgyRollSlice.actions;
 export const liturgyRollReducer = liturgyRollSlice.reducer;

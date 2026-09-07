@@ -22,6 +22,7 @@ import {
 	LITURGY_COST_MAX, LITURGY_LIMIT, addLiturgy, removeLiturgy, toggleBlessing, updateLiturgy,
 	type LiturgyBookClass
 } from '@/store/karmaSlice';
+import { setCatalogTradition } from '@/store/liturgyRollSlice';
 import {
 	LITURGY_CATALOG, TRADITIONEN, passtZurTradition, traditionOf, type LiturgyCatalogEntry
 } from '@/data/liturgies';
@@ -59,7 +60,10 @@ const LiturgyBook = () => {
 		useState<[AttributeKey, AttributeKey, AttributeKey]>(DEFAULT_ATTRIBUTES);
 	const [cost, setCost] = useState(8);
 	const [catalogOpen, setCatalogOpen] = useState(false);
-	const [tradition, setTradition] = useState(heroTradition || ALLE);
+	const catalogTradition = useSelector((state: RootState) => state.liturgyRoll.catalogTradition);
+	// Ohne eigene Wahl folgt der Filter der Tradition des Helden.
+	const tradition = catalogTradition ?? (heroTradition || ALLE);
+	const setTradition = (value: string) => dispatch(setCatalogTradition(value));
 	const [gattung, setGattung] = useState<string>(ALLE);
 	// Löschen ist der einzige Weg, einen Eintrag samt Notiz zu verlieren – die App fragt vorher.
 	const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null);
