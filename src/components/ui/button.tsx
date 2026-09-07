@@ -19,7 +19,7 @@ const buttonVariants = cva(
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
         
-        // ✨ NEUE DSA-Varianten
+        // ✨ Eigene Varianten
         success: 
           'bg-success text-white shadow-sm hover:bg-success/90 hover:shadow-success',
         failure:
@@ -28,8 +28,8 @@ const buttonVariants = cva(
           'bg-critical text-white shadow-sm hover:bg-critical/90 hover:shadow-critical',
         magic:
           'bg-magic text-white shadow-sm hover:bg-magic/90 hover:shadow-glow-sm',
-        aventurian:
-          'bg-aventurian-600 text-aventurian-50 shadow-sm hover:bg-aventurian-700 dark:bg-aventurian-500 dark:hover:bg-aventurian-600',
+        parchment:
+          'bg-parchment-600 text-parchment-50 shadow-sm hover:bg-parchment-700 dark:bg-parchment-500 dark:hover:bg-parchment-600',
       },
       size: {
         default: 'h-10 px-4 py-2',

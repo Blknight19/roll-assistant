@@ -46,7 +46,7 @@ const DevotionCard = () => {
 				<table className="w-full text-sm">
 					<caption className="sr-only">Wirkung der Entrückungsstufen</caption>
 					<thead>
-						<tr className="border-b border-aventurian-300 dark:border-aventurian-700">
+						<tr className="border-b border-parchment-300 dark:border-parchment-700">
 							<th scope="col" className="p-2 text-left font-heading">Stufe</th>
 							<th scope="col" className="p-2 text-center font-heading">Gefällig</th>
 							<th scope="col" className="p-2 text-center font-heading">Sonst</th>

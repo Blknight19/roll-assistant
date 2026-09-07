@@ -23,7 +23,7 @@ const HeroBar = () => {
 	const [editing, setEditing] = useState(false);
 
 	return (
-		<div className="mb-6 flex flex-wrap items-center gap-3 rounded-lg border border-aventurian-300 bg-card px-4 py-3 dark:border-aventurian-700">
+		<div className="mb-6 flex flex-wrap items-center gap-3 rounded-lg border border-parchment-300 bg-card px-4 py-3 dark:border-parchment-700">
 			{editing ? (
 				<Input
 					autoFocus
@@ -45,7 +45,7 @@ const HeroBar = () => {
 					className="group flex min-w-0 items-center gap-2 rounded-md py-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
 					aria-label="Name des Helden bearbeiten"
 				>
-					<User className="h-4 w-4 shrink-0 text-aventurian-600 dark:text-aventurian-400" />
+					<User className="h-4 w-4 shrink-0 text-parchment-600 dark:text-parchment-400" />
 					<span className="truncate font-heading font-semibold">
 						{name || <span className="text-muted-foreground">Held benennen</span>}
 					</span>

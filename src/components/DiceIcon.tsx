@@ -15,7 +15,7 @@ const DiceIcon = ({ value, size = 'md', variant = 'default', className }: DiceIc
   };
 
   const variantClasses = {
-    default: 'bg-card border-aventurian-400 text-foreground',
+    default: 'bg-card border-parchment-400 text-foreground',
     success: 'bg-success/20 border-success text-success-dark dark:text-success-light',
     failure: 'bg-failure/20 border-failure text-failure-dark dark:text-failure-light',
     critical: 'bg-critical/20 border-critical text-critical-dark dark:text-critical-light animate-glow',

@@ -79,7 +79,7 @@ export const initialTalentState: TalentState = {
 	]
 };
 
-/** DSA 5 steigert Fertigkeitswerte bis 25 – der frühere Deckel von 20 war zu niedrig. */
+/** Fertigkeitswerte steigen bis 25 – der frühere Deckel von 20 war zu niedrig. */
 export const TALENT_VALUE_MAX = 25;
 
 export const clampTalentValue = (value: number): number =>

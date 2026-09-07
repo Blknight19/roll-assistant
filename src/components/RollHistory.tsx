@@ -15,7 +15,7 @@ import { Trash2, Dices, Swords, Scroll, Wand2, Church, type LucideIcon } from 'l
 const ROLL_TYPE_STYLES = {
 	Talent: {
 		icon: Scroll,
-		color: 'text-aventurian-600 dark:text-aventurian-400',
+		color: 'text-parchment-600 dark:text-parchment-400',
 		plural: 'Talente'
 	},
 	Kampf: {
@@ -114,7 +114,7 @@ const RollHistory = () => {
 			{rollHistory.length === 0 ? (
 				<Card variant="parchment">
 					<CardContent className="text-center py-16">
-						<Dices className="w-20 h-20 mx-auto mb-6 float-dice text-aventurian-500" />
+						<Dices className="w-20 h-20 mx-auto mb-6 float-dice text-parchment-500" />
 						<h3 className="text-2xl font-heading font-semibold mb-3">
 							Noch keine Würfe
 						</h3>

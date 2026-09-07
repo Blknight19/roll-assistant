@@ -96,7 +96,7 @@
   h1 {
     font-size: 2.5rem;
     line-height: 1.2;
-    @apply text-aventurian-700 dark:text-aventurian-200;
+    @apply text-parchment-700 dark:text-parchment-200;
   }
 
   h2 {
@@ -112,13 +112,13 @@
   /* Links */
   a {
     font-weight: 500;
-    @apply text-aventurian-600 dark:text-aventurian-400;
+    @apply text-parchment-600 dark:text-parchment-400;
     text-decoration: inherit;
     transition: color 0.2s;
   }
 
   a:hover {
-    @apply text-aventurian-700 dark:text-aventurian-300;
+    @apply text-parchment-700 dark:text-parchment-300;
   }
 
   button:focus-visible {
@@ -142,15 +142,15 @@
   
   /* Pergament-Textur als Hintergrund */
   .bg-parchment {
-    @apply bg-aventurian-50 dark:bg-aventurian-900;
+    @apply bg-parchment-50 dark:bg-parchment-900;
     background-image: 
       url('data:image/svg+xml,%3Csvg width="100" height="100" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence baseFrequency="0.9" numOctaves="4" /%3E%3C/filter%3E%3Crect width="100" height="100" filter="url(%23noise)" opacity="0.05" /%3E%3C/svg%3E');
   }
 
   /* Gradient Background für Hero-Sections */
-  .bg-aventurian-gradient {
-    @apply bg-gradient-to-b from-aventurian-50 via-aventurian-100 to-aventurian-200;
-    @apply dark:from-aventurian-900 dark:via-aventurian-800 dark:to-black;
+  .bg-parchment-gradient {
+    @apply bg-gradient-to-b from-parchment-50 via-parchment-100 to-parchment-200;
+    @apply dark:from-parchment-900 dark:via-parchment-800 dark:to-black;
   }
 
   /* Würfel-Container mit Glow-Effekt */
@@ -160,7 +160,7 @@
   }
 
   .dice-container:hover {
-    @apply border-aventurian-500 shadow-glow-sm;
+    @apply border-parchment-500 shadow-glow-sm;
   }
 
   /* Success State */
@@ -271,9 +271,9 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-aventurian-400 dark:bg-aventurian-600 rounded-full;
+  @apply bg-parchment-400 dark:bg-parchment-600 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-aventurian-500 dark:bg-aventurian-500;
+  @apply bg-parchment-500 dark:bg-parchment-500;
 }

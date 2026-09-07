@@ -1,14 +1,14 @@
-# Review: DSA Roll Assistant
+# Review: Roll-Assistent
 
-Stand 2026-07-26, Branch `redesign`. Vollständige Quelldurchsicht; DSA-Regeln gegen das offizielle
-[Ulisses-Regel-Wiki](https://dsa.ulisses-regelwiki.de/) geprüft. Ausgangsbasis war grün
+Stand 2026-07-26, Branch `redesign`. Vollständige Quelldurchsicht; die Regellogik gegen das offizielle
+Regel-Wiki des Verlags geprüft. Ausgangsbasis war grün
 (36 Tests, `tsc` sauber), Endstand ebenfalls: **55 Unit-Tests + 23 UI-Checks**.
 
 Die vorige Fassung (2026-07-05) ist weitgehend abgearbeitet — Regel-Engine als reine Funktionen mit
 Tests, versionierte Persistenz, PWA, selbst gehostete Fonts, `ConfirmDialog`, Kampf als eigener Tab,
 QS als Hero-Zahl. Dieses Dokument ersetzt sie und hält den neuen Stand fest.
 
-**Kurzfassung:** Die DSA-Mathematik war korrekt. Kaputt war die Peripherie — überall dort, wo Werte
+**Kurzfassung:** Die Regelmathematik war korrekt. Kaputt war die Peripherie — überall dort, wo Werte
 das System betreten oder verlassen. Der teuerste Fehler war ein Default-Parameter.
 
 ---
@@ -24,9 +24,9 @@ const PropertyNumber = ({ min = 0, max = 20, ... })   // vorher
 ```
 
 `Combat.tsx` reichte für „Aktuell" und „Maximum" kein `max` durch, also griff der Default von 20.
-LeP liegt in DSA 5 bei KO×2 + Rassenbonus, real also 25–40. Wer 32 eintippte, bekam 20 — **ohne
+LeP liegt bei KO×2 + Rassenbonus, real also 25–40. Wer 32 eintippte, bekam 20 — **ohne
 jede Rückmeldung**, weil `handleInputChange` still klemmte. Dieselbe Ursache deckelte Talentwerte
-bei 20, obwohl DSA 5 bis 25 steigert.
+bei 20, obwohl das Regelwerk bis 25 steigert.
 
 Das ist kein Schönheitsfehler: Die App konnte den Charakter, für den sie gebaut ist, nicht abbilden.
 
@@ -171,7 +171,7 @@ beschönigen lassen. Stattdessen:
 
 ---
 
-## 2. DSA-5-Regeln
+## 2. Regelwerk
 
 ### 2.1 Geprüft und korrekt — bitte nicht „reparieren"
 
@@ -188,14 +188,14 @@ Gegen das offizielle Regel-Wiki verifiziert:
 | 59 Talente mit ihren Eigenschaftstripeln | alle geprüft, alle korrekt |
 
 Besonders erwähnenswert: Der Schalter `confirmCriticals` bildet exakt die offizielle optionale Regel
-[*Kein Bestätigungswurf*](https://dsa.ulisses-regelwiki.de/OR_kein_bestaetigungswurf.html) ab —
+*Kein Bestätigungswurf* ab —
 eingeschaltet gilt die Grundregel mit Bestätigungswurf, ausgeschaltet zählen 1 und 20 direkt. Der
 Beschreibungstext in `RulesSettings.tsx` stimmt wörtlich mit der Regellage überein. Das ist selten
 genau getroffen.
 
 ### 2.2 Ergänzt — Regelfolgen werden jetzt genannt
 
-Laut [Kritischer Erfolg (Attacke)](https://dsa.ulisses-regelwiki.de/Nahkampf/kritischer-erfolg-attacke.html)
+Laut der Regel *Kritischer Erfolg (Attacke)*
 halbiert eine **unbestätigte** 1 immer noch die Verteidigung des Ziels; erst der bestätigte Krit
 verdoppelt zusätzlich den Schaden. Die App sagte dazu nichts. Jetzt trägt die Ergebniskarte für
 Attacke und Fernkampf einen Konsequenzsatz. Für Parade und Ausweichen bewusst nicht — dort behandelt
@@ -240,7 +240,7 @@ Historien-Strings), keine Injection-Fläche, keine Geheimnisse. Entsprechend ehr
 | Rohe Exception im Toast (`${e}`) legte Interna offen | behoben — eigene Meldung, Details nur in die Konsole |
 | Keine Größenprüfung vor `file.text()`; eine riesige Datei fror den Tab ein | behoben — 5-MB-Grenze vor dem Lesen |
 | `NaN`/`Infinity` durch den Import | behoben, siehe 1.5 |
-| Base64 ist **keine** Verschlüsselung — die `.dsa`-Datei sieht nur undurchsichtig aus | benannt: die UI sagt es jetzt ausdrücklich, damit niemand die Datei für geschützt hält |
+| Base64 ist **keine** Verschlüsselung — die `.held`-Datei sieht nur undurchsichtig aus | benannt: die UI sagt es jetzt ausdrücklich, damit niemand die Datei für geschützt hält |
 
 ---
 
@@ -304,7 +304,7 @@ Was sich geändert hat:
   einzelnen Kampfwerte den Wurf aus.
 - **Desktop ist kein gestrecktes Handy:** ab `lg` zweispaltig, Eingabe links, Ergebnis rechts
   mitlaufend. Auf dem Handy klebt die Würfeln-Leiste in der Daumenzone.
-- **Charaktername**, auch als Export-Dateiname statt immer `charakter.dsa`.
+- **Charaktername**, auch als Export-Dateiname statt immer `charakter.held`.
 
 Ein Detail aus dem Testlauf: Bei einem Krit mit negativen FP stand „−2 FP übrig" unter einem
 Erfolg. Steht jetzt als „ohne FP-Reserve gelungen" da.
@@ -361,11 +361,11 @@ Viewport-Emulation.
 ## Wenn du nur drei Dinge mitnimmst
 
 1. **Ein Default-Parameter hat den Charakterbogen unbrauchbar gemacht** (1.1). `max = 20` sah
-   harmlos aus und deckelte die Lebensenergie jedes DSA-5-Helden. Pflichtparameter an Stellen, wo
+   harmlos aus und deckelte die Lebensenergie jedes Helden. Pflichtparameter an Stellen, wo
    es keinen sinnvollen Standardwert gibt.
 2. **Zwei Wege in denselben Zustand brauchen dieselbe Regel** (1.3). Die Reducer klemmten sauber,
    die Persistenz umging sie — und lieferte `width: NaN%`. Solche Fehler entstehen nicht in der
    Logik, sondern an den Nähten.
-3. **Die Regeln waren richtig, die Ränder nicht.** Wer die DSA-Mathematik prüft, findet nichts.
+3. **Die Regeln waren richtig, die Ränder nicht.** Wer die Regelmathematik prüft, findet nichts.
    Alles Kaputte lag dort, wo Daten die App betreten oder verlassen: Import, Persistenz,
    Eingabefelder.

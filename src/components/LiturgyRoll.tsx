@@ -174,7 +174,7 @@ const LiturgyRoll = () => {
 					<Popover open={pickerOpen} onOpenChange={setPickerOpen}>
 						<PopoverTrigger asChild>
 							<Button
-								variant="aventurian"
+								variant="parchment"
 								size="lg"
 								role="combobox"
 								className="w-full justify-between"
@@ -228,12 +228,12 @@ const LiturgyRoll = () => {
 								{entries.map((entry, index) => (
 									<span
 										key={index}
-										className="rounded-lg bg-aventurian-100/60 px-3 py-2 font-heading text-sm dark:bg-aventurian-800/60"
+										className="rounded-lg bg-parchment-100/60 px-3 py-2 font-heading text-sm dark:bg-parchment-800/60"
 									>
 										{entry.attribute} <span className="font-bold">{entry.value}</span>
 									</span>
 								))}
-								<span className="rounded-lg bg-aventurian-100/60 px-3 py-2 font-heading text-sm dark:bg-aventurian-800/60">
+								<span className="rounded-lg bg-parchment-100/60 px-3 py-2 font-heading text-sm dark:bg-parchment-800/60">
 									FW <span className="font-bold">{liturgy.value}</span>
 								</span>
 							</div>
@@ -303,7 +303,7 @@ const LiturgyRoll = () => {
 					<ResourceBar label="KaP" current={kap.current} max={kap.max} tone="karma" className="w-full" />
 
 					<div className="flex flex-wrap items-center justify-center gap-2">
-						<span className="mr-1 font-heading text-sm uppercase tracking-wide text-aventurian-700 dark:text-aventurian-300">
+						<span className="mr-1 font-heading text-sm uppercase tracking-wide text-parchment-700 dark:text-parchment-300">
 							Verbrauch
 						</span>
 						{[1, 4, 8].map(amount => (

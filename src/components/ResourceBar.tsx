@@ -25,7 +25,7 @@ const ResourceBar = ({ label, current, max, tone, className = '' }: ResourceBarP
 				{label}
 			</span>
 			<div
-				className={`relative h-4 overflow-hidden rounded-full border border-aventurian-400 bg-muted dark:border-aventurian-600 ${className}`}
+				className={`relative h-4 overflow-hidden rounded-full border border-parchment-400 bg-muted dark:border-parchment-600 ${className}`}
 				role="img"
 				aria-label={`${label} ${current} von ${max}`}
 			>

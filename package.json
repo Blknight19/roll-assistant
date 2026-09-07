@@ -1,9 +1,9 @@
 {
-  "name": "dsa-sheet",
+  "name": "roll-assistant",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://blknight19.github.io/dsa-roll-assistant",
+  "homepage": "https://blknight19.github.io/roll-assistant",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

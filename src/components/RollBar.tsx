@@ -58,7 +58,7 @@ const RollBar = ({
 	return (
 		<div
 			className={cn(
-				'rounded-lg border border-aventurian-300 bg-card p-4 shadow-lg dark:border-aventurian-700',
+				'rounded-lg border border-parchment-300 bg-card p-4 shadow-lg dark:border-parchment-700',
 				sticky
 					? 'sticky bottom-4 z-40 mt-4 lg:hidden'
 					: 'hidden lg:sticky lg:bottom-4 lg:block',
@@ -71,7 +71,7 @@ const RollBar = ({
 				<Button
 					onClick={disabled ? undefined : onRoll}
 					size="xl"
-					variant="aventurian"
+					variant="parchment"
 					aria-disabled={disabled || undefined}
 					aria-describedby={showsReason ? reasonId : undefined}
 					className={cn(

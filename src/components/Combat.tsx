@@ -117,7 +117,7 @@ const Combat = () => {
 				</CardHeader>
 				<CardContent className="space-y-4">
 					<div
-						className="relative h-8 w-full overflow-hidden rounded-full border-2 border-aventurian-400 bg-muted dark:border-aventurian-600"
+						className="relative h-8 w-full overflow-hidden rounded-full border-2 border-parchment-400 bg-muted dark:border-parchment-600"
 						role="img"
 						aria-label={`Lebensenergie ${combat.life.current} von ${combat.life.max}`}
 					>
@@ -157,7 +157,7 @@ const Combat = () => {
 					</div>
 
 					<div className="flex flex-wrap items-center justify-center gap-2">
-						<span className="mr-1 font-heading text-sm uppercase tracking-wide text-aventurian-700 dark:text-aventurian-300">
+						<span className="mr-1 font-heading text-sm uppercase tracking-wide text-parchment-700 dark:text-parchment-300">
 							Schaden
 						</span>
 						{[1, 3, 5].map((damage) => (
@@ -220,9 +220,9 @@ const Combat = () => {
 							return (
 								<div
 									key={key}
-									className="flex flex-col items-center gap-2 rounded-lg bg-aventurian-100/50 p-3 transition-colors hover:bg-aventurian-200/50 dark:bg-aventurian-800/50 dark:hover:bg-aventurian-700/50"
+									className="flex flex-col items-center gap-2 rounded-lg bg-parchment-100/50 p-3 transition-colors hover:bg-parchment-200/50 dark:bg-parchment-800/50 dark:hover:bg-parchment-700/50"
 								>
-									<Icon className="h-5 w-5 text-aventurian-600 dark:text-aventurian-400" />
+									<Icon className="h-5 w-5 text-parchment-600 dark:text-parchment-400" />
 									<PropertyNumber
 										label={type}
 										value={combat[key]}
@@ -232,7 +232,7 @@ const Combat = () => {
 									/>
 									<Button
 										size="sm"
-										variant="aventurian"
+										variant="parchment"
 										onClick={() => roll(type, combat[key])}
 										className="w-full"
 										aria-label={`${combatLabels[type]} würfeln`}

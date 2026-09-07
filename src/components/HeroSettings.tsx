@@ -15,7 +15,7 @@ const ANDERE = 'andere';
 
 /**
  * Charakterbezogene Schalter – bewusst getrennt von `RulesSettings`: die dortigen
- * Einstellungen gehören der App, dieser hier wandert mit in die .dsa-Datei.
+ * Einstellungen gehören der App, dieser hier wandert mit in die .held-Datei.
  */
 const HeroSettings = () => {
 	const dispatch = useDispatch();

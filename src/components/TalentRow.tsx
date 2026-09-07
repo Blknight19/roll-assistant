@@ -11,16 +11,16 @@ type TalentRowProps = {
 const TalentRow = memo(({ talent, striped, onChange }: TalentRowProps) => (
 	<tr
 		className={`
-			border-b border-aventurian-200 dark:border-aventurian-700
-			hover:bg-aventurian-100/50 dark:hover:bg-aventurian-800/50
+			border-b border-parchment-200 dark:border-parchment-700
+			hover:bg-parchment-100/50 dark:hover:bg-parchment-800/50
 			transition-colors
-			${striped ? 'bg-aventurian-50/30 dark:bg-aventurian-900/30' : ''}
+			${striped ? 'bg-parchment-50/30 dark:bg-parchment-900/30' : ''}
 		`}
 	>
 		<td className="p-3 text-base">{talent.name}</td>
 		{[talent.attribute1, talent.attribute2, talent.attribute3].map((attribute, index) => (
 			<td key={index} className="p-3 text-center">
-				<span className="px-2 py-1 rounded bg-aventurian-200 dark:bg-aventurian-700 font-heading text-xs">
+				<span className="px-2 py-1 rounded bg-parchment-200 dark:bg-parchment-700 font-heading text-xs">
 					{attribute}
 				</span>
 			</td>
@@ -45,7 +45,7 @@ TalentRow.displayName = 'TalentRow';
  * neben dem Namen, die Eigenschaften rutschen darunter.
  */
 export const TalentListItem = memo(({ talent, onChange }: Omit<TalentRowProps, 'striped'>) => (
-	<div className="flex items-center justify-between gap-3 rounded-lg border border-aventurian-200 bg-aventurian-50/30 p-3 dark:border-aventurian-700 dark:bg-aventurian-900/30">
+	<div className="flex items-center justify-between gap-3 rounded-lg border border-parchment-200 bg-parchment-50/30 p-3 dark:border-parchment-700 dark:bg-parchment-900/30">
 		<div className="min-w-0">
 			{/* Umbrechen statt abschneiden: „Körperbeherrschung" wäre sonst nicht mehr
 			    von „Körperkraft" zu unterscheiden. */}
@@ -54,7 +54,7 @@ export const TalentListItem = memo(({ talent, onChange }: Omit<TalentRowProps, '
 				{[talent.attribute1, talent.attribute2, talent.attribute3].map((attribute, index) => (
 					<span
 						key={index}
-						className="rounded bg-aventurian-200 px-2 py-0.5 font-heading text-xs dark:bg-aventurian-700"
+						className="rounded bg-parchment-200 px-2 py-0.5 font-heading text-xs dark:bg-parchment-700"
 					>
 						{attribute}
 					</span>

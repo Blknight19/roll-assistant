@@ -30,8 +30,8 @@ export default {
         sm: 'calc(var(--radius) - 4px)'
       },
       colors: {
-        // Aventurien-Farbpalette (Erdtöne + Bronze/Gold)
-        aventurian: {
+        // Pergament-Farbpalette (Erdtöne + Bronze/Gold)
+        parchment: {
           50: '#fdfbf7',
           100: '#f6f1e8',
           200: '#e8dac5',

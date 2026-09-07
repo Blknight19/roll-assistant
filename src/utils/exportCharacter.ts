@@ -7,7 +7,7 @@ const fileNameFor = (name: string): string => {
 		.replace(/[äöüß]/g, match => ({ ä: 'ae', ö: 'oe', ü: 'ue', ß: 'ss' })[match] ?? match)
 		.replace(/[^a-z0-9]+/g, '-')
 		.replace(/^-+|-+$/g, '');
-	return `${slug || 'charakter'}.dsa`;
+	return `${slug || 'charakter'}.held`;
 };
 
 export const exportCharacter = () => {

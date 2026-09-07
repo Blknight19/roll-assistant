@@ -14,7 +14,7 @@ const CastingTab = () => {
 
 	return (
 		<Tabs value={domain} onValueChange={(value) => setDomain(value as 'magic' | 'karma')}>
-			<TabsList className="mx-auto mb-4 grid w-full max-w-xs grid-cols-2 bg-aventurian-100 dark:bg-aventurian-800">
+			<TabsList className="mx-auto mb-4 grid w-full max-w-xs grid-cols-2 bg-parchment-100 dark:bg-parchment-800">
 				<TabsTrigger value="magic" className="gap-2 font-heading" aria-label="Magie">
 					<Wand2 className="h-4 w-4" />
 					Magie

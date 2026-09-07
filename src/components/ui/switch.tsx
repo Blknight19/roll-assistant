@@ -16,7 +16,7 @@ const Switch = ({ checked, onCheckedChange, className, ...props }: SwitchProps) 
     onClick={() => onCheckedChange(!checked)}
     className={cn(
       'relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors',
-      checked ? 'bg-aventurian-600 dark:bg-aventurian-500' : 'bg-muted-foreground/40',
+      checked ? 'bg-parchment-600 dark:bg-parchment-500' : 'bg-muted-foreground/40',
       className
     )}
     {...props}

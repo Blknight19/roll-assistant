@@ -50,9 +50,9 @@ export default defineConfig({
       injectRegister: null,
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: 'DSA Roll Assistant',
-        short_name: 'DSA Würfel',
-        description: 'Digitaler Würfelassistent und Charakterbogen für DSA 5',
+        name: 'Roll-Assistent',
+        short_name: 'Würfeln',
+        description: 'Digitaler Würfelassistent und Charakterbogen',
         lang: 'de',
         start_url: '.',
         scope: '.',
@@ -72,7 +72,7 @@ export default defineConfig({
   define: {
     __APP_VERSION__: JSON.stringify(appVersion()),
   },
-  base: '/dsa-roll-assistant/',
+  base: '/roll-assistant/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

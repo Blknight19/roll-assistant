@@ -16,13 +16,13 @@ const ThemeToggle = () => {
 			onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
 			variant="ghost"
 			size="icon"
-			className="rounded-full hover:bg-aventurian-200 dark:hover:bg-aventurian-700"
+			className="rounded-full hover:bg-parchment-200 dark:hover:bg-parchment-700"
 			aria-label='Theme wechseln'
 		>
 			{resolvedTheme === 'dark' ? (
-				<Moon className="w-5 h-5 text-aventurian-400" />
+				<Moon className="w-5 h-5 text-parchment-400" />
 			) : (
-				<Sun className="w-5 h-5 text-aventurian-600" />
+				<Sun className="w-5 h-5 text-parchment-600" />
 			)}
 		</Button>
 	);

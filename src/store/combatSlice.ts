@@ -33,7 +33,7 @@ export type CombatStatKey = Exclude<keyof CombatState, 'life'>;
 
 export const COMBAT_STAT_KEYS: CombatStatKey[] = ['attack', 'save', 'dodge', 'initiative', 'ranged'];
 
-/** Obergrenzen großzügig: LeP liegen in DSA 5 bei KO×2 + Rassenbonus, also deutlich über 20. */
+/** Obergrenzen großzügig: LeP liegen bei KO×2 + Rassenbonus, also deutlich über 20. */
 export const COMBAT_STAT_MAX = 99;
 export const LIFE_MAX = 999;
 

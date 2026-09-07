@@ -12,7 +12,7 @@ const SustainedEffects = () => {
 		<Card variant="parchment">
 			<CardHeader className="pb-3">
 				<CardTitle className="flex items-center gap-2 text-lg">
-					<Timer className="h-5 w-5 text-aventurian-600 dark:text-aventurian-400" />
+					<Timer className="h-5 w-5 text-parchment-600 dark:text-parchment-400" />
 					Laufende Effekte
 				</CardTitle>
 			</CardHeader>
@@ -25,7 +25,7 @@ const SustainedEffects = () => {
 					return (
 						<div
 							key={`${entry.kind}-${entry.id}`}
-							className="flex items-center gap-3 rounded-lg bg-aventurian-100/50 px-3 py-2 dark:bg-aventurian-800/50"
+							className="flex items-center gap-3 rounded-lg bg-parchment-100/50 px-3 py-2 dark:bg-parchment-800/50"
 						>
 							<Icon
 								className={`h-4 w-4 shrink-0 ${tone}`}

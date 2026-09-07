@@ -51,7 +51,9 @@ import { LITURGY_CATALOG } from '@/data/liturgies';
 import { clampDevotionLevel } from '@/data/liturgies/devotion';
 import { stripControlChars } from '@/utils/text';
 
-const STORAGE_KEY = 'dsa-app-state';
+const STORAGE_KEY = 'roll-app-state';
+/** Schlüssel vor der Umbenennung – wird beim ersten Laden einmalig übernommen. */
+const LEGACY_STORAGE_KEY = 'dsa-app-state';
 
 export const PERSISTED_VERSION = 5;
 
@@ -430,8 +432,11 @@ export const toPersisted = (state: PersistedSlices): PersistedState => ({
 
 export const loadState = (): PersistedSlices | undefined => {
 	try {
-		const serialized = localStorage.getItem(STORAGE_KEY);
+		const serialized = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY);
 		if (!serialized) return undefined;
+		// Der nächste saveState schreibt unter den neuen Schlüssel; der alte fällt hier weg,
+		// damit ein späterer Reset nicht den veralteten Stand zurückholt.
+		localStorage.removeItem(LEGACY_STORAGE_KEY);
 		return migratePersisted(JSON.parse(serialized));
 	} catch {
 		// Ein unlesbarer Blob darf den Start nicht verhindern – dann eben Defaults.
@@ -449,4 +454,5 @@ export const saveState = (state: PersistedSlices) => {
 
 export const clearPersistedState = () => {
 	localStorage.removeItem(STORAGE_KEY);
+	localStorage.removeItem(LEGACY_STORAGE_KEY);
 };

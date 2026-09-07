@@ -33,14 +33,14 @@ const ImportExportSettings = () => {
 						Charakter Exportieren
 					</CardTitle>
 					<CardDescription>
-						Sichere deinen Charakter als .dsa-Datei. Der Inhalt ist nur kodiert,
+						Sichere deinen Charakter als .held-Datei. Der Inhalt ist nur kodiert,
 						nicht verschlüsselt. Wer die Datei hat, kann sie lesen.
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
 					<Button 
 						onClick={exportCharacter}
-						variant="aventurian"
+						variant="parchment"
 						size="lg"
 						className="w-full"
 					>
@@ -65,7 +65,7 @@ const ImportExportSettings = () => {
 					<input
 						ref={fileInput}
 						type="file"
-						accept=".dsa"
+						accept=".held,.dsa"
 						className="hidden"
 						onChange={(e) => handleFileSelected(e.currentTarget)}
 					/>

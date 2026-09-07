@@ -28,7 +28,7 @@ Version auf GitHub Pages.
 |---|---|
 | Art | Reine Client-App (React, Vite, PWA), kein Backend, keine Accounts |
 | Hosting | GitHub Pages, statische Dateien, Deployment per `gh-pages` vom Entwicklerrechner |
-| Datenhaltung | Ausschließlich `localStorage` im Browser des Nutzers (Key `dsa-app-state`) |
+| Datenhaltung | Ausschließlich `localStorage` im Browser des Nutzers (Key `roll-app-state`) |
 | Netzwerk zur Laufzeit | Keines außer dem Laden der eigenen Dateien (CSP `connect-src 'self'`) |
 | Externe Daten | Zauberkatalog wird zur **Entwicklungszeit** aus einer Fremdquelle erzeugt, nie zur Laufzeit |
 | Personenbezug | Nur der frei gewählte Heldenname; keine Telemetrie, keine Third-Party-Requests |
@@ -38,7 +38,7 @@ Version auf GitHub Pages.
 Es gibt keinen Server, keine Sitzungen und keine Geheimnisse. Ein Angreifer kann daher
 nur über drei Wege Einfluss nehmen:
 
-1. **Präparierte Charakterdatei (`.dsa`)** – ein Nutzer importiert eine Datei aus fremder
+1. **Präparierte Charakterdatei (`.held`)** – ein Nutzer importiert eine Datei aus fremder
    Hand. Ziel des Angreifers: Code ausführen, Daten des Nutzers zerstören oder die App
    unbenutzbar machen.
 2. **Manipulierter `localStorage`** – z. B. durch eine andere Seite auf demselben Origin

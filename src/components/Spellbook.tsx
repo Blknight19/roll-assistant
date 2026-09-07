@@ -121,7 +121,7 @@ const Spellbook = () => {
 							{spells.map(spell => (
 								<div
 									key={spell.id}
-									className="space-y-3 rounded-lg border border-aventurian-200 bg-aventurian-50/50 p-3 dark:border-aventurian-700 dark:bg-aventurian-900/30"
+									className="space-y-3 rounded-lg border border-parchment-200 bg-parchment-50/50 p-3 dark:border-parchment-700 dark:bg-parchment-900/30"
 								>
 									<div className="flex items-start justify-between gap-2">
 										<div className="min-w-0">
@@ -185,8 +185,8 @@ const Spellbook = () => {
 
 						<div className="hidden overflow-x-auto sm:block">
 							<table className="min-w-full text-sm">
-								<thead className="sticky top-0 z-10 bg-aventurian-100 dark:bg-aventurian-800">
-									<tr className="border-b-2 border-aventurian-400 dark:border-aventurian-600">
+								<thead className="sticky top-0 z-10 bg-parchment-100 dark:bg-parchment-800">
+									<tr className="border-b-2 border-parchment-400 dark:border-parchment-600">
 										<th className="p-3 text-left font-heading">Name</th>
 										<th className="p-3 text-center font-heading">Probe</th>
 										<th className="p-3 text-center font-heading">Dauer</th>
@@ -200,7 +200,7 @@ const Spellbook = () => {
 									{spells.map((spell, index) => (
 										<tr
 											key={spell.id}
-											className={index % 2 === 0 ? 'bg-aventurian-50/50 dark:bg-aventurian-900/30' : ''}
+											className={index % 2 === 0 ? 'bg-parchment-50/50 dark:bg-parchment-900/30' : ''}
 										>
 											<td className="p-3">
 												<div className="font-heading">{spell.name}</div>
@@ -278,7 +278,7 @@ const Spellbook = () => {
 					<Popover open={catalogOpen} onOpenChange={setCatalogOpen}>
 						<PopoverTrigger asChild>
 							<Button
-								variant="aventurian"
+								variant="parchment"
 								size="lg"
 								role="combobox"
 								className="w-full justify-between"
@@ -411,7 +411,7 @@ const Spellbook = () => {
 
 						<PropertyNumber label="AsP" value={cost} max={SPELL_COST_MAX} size="s" onChange={setCost} />
 
-						<Button variant="aventurian" onClick={create} disabled={!name.trim() || full}>
+						<Button variant="parchment" onClick={create} disabled={!name.trim() || full}>
 							<Plus className="mr-1 h-4 w-4" />
 							Hinzufügen
 						</Button>

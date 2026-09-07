@@ -26,7 +26,7 @@ const RulesSettings = () => {
 						</label>
 						<p className="text-sm text-muted-foreground">
 							Kritische Erfolge und Patzer im Kampf müssen mit einem zweiten W20
-							bestätigt werden (DSA-5-Grundregel). Ausgeschaltet gelten 1 und 20 direkt.
+							bestätigt werden (Grundregel). Ausgeschaltet gelten 1 und 20 direkt.
 						</p>
 					</div>
 					<Switch

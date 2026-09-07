@@ -6,7 +6,7 @@ export type SpellClass = 'zauber' | 'ritual' | 'hexenfluch';
 /**
  * Regelwissen, nicht Charakterdaten: unveränderlich, nicht persistiert, nicht
  * exportiert. Beim Übernehmen ins Zauberbuch wird ein Eintrag kopiert – der Spieler
- * darf danach alles überschreiben, und eine .dsa-Datei bleibt lesbar, auch wenn sich
+ * darf danach alles überschreiben, und eine .held-Datei bleibt lesbar, auch wenn sich
  * dieser Katalog später ändert.
  *
  * Die Dateien neben dieser erzeugt `scripts/import-spells`. Änderungen von Hand gehen

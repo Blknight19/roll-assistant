@@ -4,7 +4,7 @@ Ein digitaler Würfelassistent und Charakterbogen.
 
 ## ✨ Features
 
-- **Talentproben** mit 3W20-Mechanik (DSA 5)
+- **Talentproben** mit 3W20-Mechanik
 - **Einfache Würfelwürfe** (W4, W6, W8, W10, W12, W20)
 - **Kampfwürfe** (Attacke, Parade, Ausweichen, Fernkampf, Initiative)
 - **Zauberproben** (3W20) mit automatischer AsP-Buchung, halbe Kosten bei misslungener Probe und bei kritischem Erfolg
@@ -17,12 +17,12 @@ Ein digitaler Würfelassistent und Charakterbogen.
 - **Laufende Effekte** zählen Zauber und Liturgien gemeinsam (−1 je Effekt auf alle Zauber- und Liturgieproben)
 - **Charakterverwaltung**
   - Eigenschaften (MU, KL, IN, CH, FF, GE, KO, KK)
-  - 59 DSA-Talente
+  - 59 Talente
   - Kampfwerte & Lebensenergie
   - Astralenergie & Zauberbuch (für zauberkundige Helden)
   - Karmaenergie & Liturgienbuch (für geweihte Helden), Tradition mit KaP-Richtwert
 - **Würfelhistorie** mit LocalStorage-Persistenz
-- **Import/Export** von Charakterdaten (.dsa-Datei)
+- **Import/Export** von Charakterdaten (.held-Datei)
 - **Dark/Light Mode** mit automatischer Systemerkennung
 - **Mobile-optimiert** & Responsive
 - **Offline-fähig & installierbar** (PWA), funktioniert auch ohne Netz am Spieltisch
@@ -71,7 +71,7 @@ Die App läuft standardmäßig auf `http://localhost:5173`
 
 1. Gehe zu **Charakter → Einstellungen**
 2. Klicke auf "Charakter exportieren"
-3. .dsa-Datei wird heruntergeladen
+3. .held-Datei wird heruntergeladen
 4. Import: "Charakter importieren" → Datei auswählen
 
 ## 🤝 Contributing
@@ -80,7 +80,7 @@ Contributions sind willkommen! Bitte öffne ein Issue oder Pull Request.
 
 ## 🐛 Bug Reports
 
-Gefunden einen Bug? [Erstelle ein Issue](https://github.com/Blknight19/dsa-roll-assistant/issues/new)
+Gefunden einen Bug? [Erstelle ein Issue](https://github.com/Blknight19/roll-assistant/issues/new)
 
 ---
 

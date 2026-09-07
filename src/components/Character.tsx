@@ -66,7 +66,7 @@ const Character = () => {
 								{ATTRIBUTE_KEYS.map((key) => (
 									<div
 										key={key}
-										className="flex flex-col items-center p-6 rounded-lg bg-aventurian-100/50 dark:bg-aventurian-800/50 hover:bg-aventurian-200/50 dark:hover:bg-aventurian-700/50 transition-colors"
+										className="flex flex-col items-center p-6 rounded-lg bg-parchment-100/50 dark:bg-parchment-800/50 hover:bg-parchment-200/50 dark:hover:bg-parchment-700/50 transition-colors"
 									>
 										<PropertyNumber
 											label={key}
@@ -117,8 +117,8 @@ const Character = () => {
 
 							<div className="hidden overflow-x-auto sm:block">
 								<table className="min-w-full text-sm">
-									<thead className="sticky top-0 bg-aventurian-100 dark:bg-aventurian-800 z-10">
-										<tr className="border-b-2 border-aventurian-400 dark:border-aventurian-600">
+									<thead className="sticky top-0 bg-parchment-100 dark:bg-parchment-800 z-10">
+										<tr className="border-b-2 border-parchment-400 dark:border-parchment-600">
 											<th className="p-3 text-left font-heading">Name</th>
 											<th className="p-3 text-center font-heading">Eig. 1</th>
 											<th className="p-3 text-center font-heading">Eig. 2</th>

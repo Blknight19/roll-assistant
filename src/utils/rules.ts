@@ -1,4 +1,4 @@
-// Regelwerk-Logik für DSA-5-Proben. Vorzeichen-Konvention wie im Regelwerk:
+// Regelwerk-Logik für Proben. Vorzeichen-Konvention wie im Regelwerk:
 // negativer Modifikator = Erschwernis, positiver = Erleichterung.
 
 export type Special = 'krit' | 'patzer' | null;
@@ -68,7 +68,7 @@ export type CombatRollResult = {
 /**
  * Bewertet einen Kampfwurf. Ohne `confirmationRoll` gelten 1/20 direkt als
  * Krit/Patzer (Hausregel, Toggle aus); mit Bestätigungswurf entscheidet der
- * zweite W20 gegen denselben Zielwert (DSA-5-Grundregel).
+ * zweite W20 gegen denselben Zielwert (Grundregel).
  */
 export const evaluateCombatRoll = (
   value: number,

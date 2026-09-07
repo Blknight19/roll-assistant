@@ -8,7 +8,7 @@ const cardVariants = cva(
     variants: {
       variant: {
         default: 'bg-card',
-        parchment: 'bg-parchment border-aventurian-300 dark:border-aventurian-700',
+        parchment: 'bg-parchment border-parchment-300 dark:border-parchment-700',
         success: 'bg-success/10 border-success',
         failure: 'bg-failure/10 border-failure',
         critical: 'bg-critical/10 border-critical',

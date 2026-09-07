@@ -5,7 +5,7 @@
  *
  * Dieselbe Liste prüft `scripts/import-spells/parse.mjs` beim Katalog. Beide Eingangstore
  * für fremden Text müssen sie kennen: der Katalog zur Entwicklungszeit, die
- * `.dsa`-Datei und der localStorage zur Laufzeit.
+ * `.held`-Datei und der localStorage zur Laufzeit.
  */
 const IST_STEUERZEICHEN = (codePoint: number): boolean =>
 	codePoint < 0x20 ||

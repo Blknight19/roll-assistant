@@ -9,7 +9,7 @@ export const KORREKTUREN = {
 		felder: { cost: 8, costText: '8 AsP', duration: 'QS x 3 in KR' }
 	},
 	invercano: {
-		grund: 'Aventurische Magie S. 134; Quelle nennt abweichend 2 Aktionen und QS x 2',
+		grund: 'Regelwerk S. 134; Quelle nennt abweichend 2 Aktionen und QS x 2',
 		felder: { castTime: '1 Aktion', duration: 'QS KR' }
 	},
 	paralysis: {

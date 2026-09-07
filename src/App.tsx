@@ -43,17 +43,17 @@ function App() {
 
   return (
     <>
-      {/* Aventurian Gradient Background */}
-      <div className='min-h-screen bg-aventurian-gradient p-4 flex flex-col'>
+      {/* Parchment Gradient Background */}
+      <div className='min-h-screen bg-parchment-gradient p-4 flex flex-col'>
 
         {/* Header */}
-        <header className="sticky top-0 z-50 backdrop-blur-sm bg-background/80 border-b border-aventurian-400 dark:border-aventurian-600 mb-6 -mx-4 px-4 py-3">
+        <header className="sticky top-0 z-50 backdrop-blur-sm bg-background/80 border-b border-parchment-400 dark:border-parchment-600 mb-6 -mx-4 px-4 py-3">
           <div className="container mx-auto flex items-center justify-between">
             {/* Logo/Title */}
             <div className="flex items-center gap-3">
-              <Swords className="w-8 h-8 text-aventurian-600 dark:text-aventurian-300" />
+              <Swords className="w-8 h-8 text-parchment-600 dark:text-parchment-300" />
               <div>
-                <h1 className="text-2xl md:text-3xl font-heading font-bold text-aventurian-700 dark:text-aventurian-200">
+                <h1 className="text-2xl md:text-3xl font-heading font-bold text-parchment-700 dark:text-parchment-200">
                   Roll-Assistent
                 </h1>
               </div>
@@ -71,7 +71,7 @@ function App() {
           <div className='w-full max-w-6xl'>
             <Tabs value={tab} onValueChange={setTab} className="w-full">
               <TabsList
-                className={`grid w-full ${domains.any ? 'grid-cols-6' : 'grid-cols-5'} h-auto mb-4 bg-aventurian-100 dark:bg-aventurian-800`}
+                className={`grid w-full ${domains.any ? 'grid-cols-6' : 'grid-cols-5'} h-auto mb-4 bg-parchment-100 dark:bg-parchment-800`}
               >
                 {tabs.map(({ value, label, icon: Icon }) => (
                   <TabsTrigger

@@ -115,7 +115,7 @@ const TalentRoll = () => {
 					<Popover open={pickerOpen} onOpenChange={setPickerOpen}>
 						<PopoverTrigger asChild>
 							<Button
-								variant="aventurian"
+								variant="parchment"
 								size="lg"
 								role="combobox"
 								className="w-full justify-between"
@@ -153,7 +153,7 @@ const TalentRoll = () => {
 								{probe.entries.map((entry, index) => (
 									<div
 										key={index}
-										className="flex flex-col items-center gap-3 rounded-lg bg-aventurian-100/50 p-3 dark:bg-aventurian-800/50"
+										className="flex flex-col items-center gap-3 rounded-lg bg-parchment-100/50 p-3 dark:bg-parchment-800/50"
 									>
 										<Select
 											value={entry.attribute}
@@ -198,7 +198,7 @@ const TalentRoll = () => {
 							{probe.entries.map((entry, index) => (
 								<span
 									key={index}
-									className="rounded-lg bg-aventurian-100/60 px-3 py-2 font-heading text-sm dark:bg-aventurian-800/60"
+									className="rounded-lg bg-parchment-100/60 px-3 py-2 font-heading text-sm dark:bg-parchment-800/60"
 								>
 									{entry.attribute} <span className="font-bold">{entry.value}</span>
 								</span>

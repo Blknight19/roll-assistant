@@ -112,7 +112,7 @@ const PropertyNumber: React.FC<PropertyNumberProps> = ({
         <label
           htmlFor={inputId}
           className={cn(
-            'text-sm font-heading font-semibold uppercase tracking-wide text-aventurian-700 dark:text-aventurian-300',
+            'text-sm font-heading font-semibold uppercase tracking-wide text-parchment-700 dark:text-parchment-300',
             labelMargin
           )}
         >
@@ -144,8 +144,8 @@ const PropertyNumber: React.FC<PropertyNumberProps> = ({
           max={max}
           aria-label={spokenName || undefined}
           className={cn(
-            'text-center font-heading font-bold border-2 border-aventurian-400 dark:border-aventurian-600',
-            'focus:border-aventurian-600 dark:focus:border-aventurian-400',
+            'text-center font-heading font-bold border-2 border-parchment-400 dark:border-parchment-600',
+            'focus:border-parchment-600 dark:focus:border-parchment-400',
             'bg-card',
             inputSizes[size]
           )}

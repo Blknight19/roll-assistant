@@ -61,7 +61,7 @@ const CircumstanceChips = ({ klasse, fw, costText, active, onToggle }: Circumsta
 											'min-h-11 rounded-full border px-3 py-1.5 font-body text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
 											pressed
 												? 'border-karma bg-karma/15 text-karma-dark dark:text-karma-light'
-												: 'border-aventurian-300 bg-card hover:bg-aventurian-100/60 dark:border-aventurian-700 dark:hover:bg-aventurian-800/60',
+												: 'border-parchment-300 bg-card hover:bg-parchment-100/60 dark:border-parchment-700 dark:hover:bg-parchment-800/60',
 											disabled && 'cursor-not-allowed opacity-50'
 										)}
 									>

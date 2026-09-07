@@ -1,25 +1,25 @@
 ---
 name: verify
-description: Build, launch and drive the DSA Roll Assistant end-to-end to verify changes at the UI surface (Playwright against vite preview).
+description: Build, launch and drive the Roll-Assistent end-to-end to verify changes at the UI surface (Playwright against vite preview).
 ---
 
-# Verify: DSA Roll Assistant
+# Verify: Roll-Assistent
 
 ## Build & Launch
 
 ```powershell
 npm run build          # tsc -b && vite build (PWA sw.js wird mitgebaut)
-npm run preview        # serviert dist auf http://localhost:4173/dsa-roll-assistant/
+npm run preview        # serviert dist auf http://localhost:4173/roll-assistant/
 ```
 
-Die Basis-URL enthält den gh-pages-Pfad: `http://localhost:4173/dsa-roll-assistant/`.
+Die Basis-URL enthält den gh-pages-Pfad: `http://localhost:4173/roll-assistant/`.
 
 ## Drive (Playwright)
 
 Playwright ist keine Projekt-Dependency — bei Bedarf `npm install --no-save playwright`
 (Chromium liegt meist schon in `%LOCALAPPDATA%\ms-playwright`). Skript außerhalb des
 Repos muss Playwright per absolutem Pfad importieren:
-`import { chromium } from 'file:///.../dsa-roll-assistant/node_modules/playwright/index.mjs'`.
+`import { chromium } from 'file:///.../roll-assistant/node_modules/playwright/index.mjs'`.
 
 ### Deterministische Würfe
 
@@ -35,7 +35,7 @@ Math.random = () => (window.__rolls.length ? window.__rolls.shift() : orig());
 
 ### localStorage-Seed
 
-Persistenz-Key: `dsa-app-state`. Aktuelles Format ist v5: `{ version: 5,
+Persistenz-Key: `roll-app-state`. Aktuelles Format ist v5: `{ version: 5,
 activeCharacterId, characters: [{ id, name, attributes, talents: [{id,value}],
 combat, spellbook, karma }], history, settings }`. `spellbook` je Charakter ist
 `{ isSpellcaster, asp: { current, max }, spells: [...], upkeep: [...] }`, `karma` ist
