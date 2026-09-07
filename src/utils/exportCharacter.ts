@@ -11,8 +11,8 @@ const fileNameFor = (name: string): string => {
 };
 
 export const exportCharacter = () => {
-	const { profile, attributes, talents, combat, spellbook, roll, settings } = store.getState();
-	const snapshot = toPersisted({ profile, attributes, talents, combat, spellbook, roll, settings });
+	const { profile, attributes, talents, combat, spellbook, karma, roll, settings } = store.getState();
+	const snapshot = toPersisted({ profile, attributes, talents, combat, spellbook, karma, roll, settings });
 
 	// `toPersisted` trägt die Version schon – Datei und localStorage teilen ein Format.
 	const payload = JSON.stringify(snapshot, null, 2);

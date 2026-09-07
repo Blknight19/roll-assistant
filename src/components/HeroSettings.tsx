@@ -1,9 +1,17 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
+import {
+	Select, SelectContent, SelectItem, SelectTrigger, SelectValue
+} from '@/components/ui/select';
 import type { RootState } from '@/store';
+import { setBlessed, setTradition } from '@/store/karmaSlice';
 import { setSpellcaster } from '@/store/spellbookSlice';
+import { TRADITIONEN } from '@/data/liturgies';
 import { User } from 'lucide-react';
+
+/** Wert des Select-Eintrags für „keine Tradition" – Radix erlaubt keinen leeren Wert. */
+const ANDERE = 'andere';
 
 /**
  * Charakterbezogene Schalter – bewusst getrennt von `RulesSettings`: die dortigen
@@ -12,6 +20,8 @@ import { User } from 'lucide-react';
 const HeroSettings = () => {
 	const dispatch = useDispatch();
 	const isSpellcaster = useSelector((state: RootState) => state.spellbook.isSpellcaster);
+	const isBlessed = useSelector((state: RootState) => state.karma.isBlessed);
+	const tradition = useSelector((state: RootState) => state.karma.tradition);
 
 	return (
 		<Card variant="parchment">
@@ -21,7 +31,7 @@ const HeroSettings = () => {
 					Held
 				</CardTitle>
 			</CardHeader>
-			<CardContent>
+			<CardContent className="space-y-5">
 				<div className="flex items-center justify-between gap-4">
 					<div className="text-left">
 						<label htmlFor="is-spellcaster" className="font-semibold">
@@ -39,6 +49,60 @@ const HeroSettings = () => {
 						aria-label="Held ist zauberkundig"
 					/>
 				</div>
+
+				<div className="flex items-center justify-between gap-4">
+					<div className="text-left">
+						<label htmlFor="is-blessed" className="font-semibold">
+							Geweiht
+						</label>
+						<p className="text-sm text-muted-foreground">
+							Blendet den Liturgie-Tab, die KaP-Leiste und das Liturgienbuch ein.
+							Ausschalten blendet sie nur aus. Liturgien und KaP bleiben erhalten.
+						</p>
+					</div>
+					<Switch
+						id="is-blessed"
+						checked={isBlessed}
+						onCheckedChange={(checked) => dispatch(setBlessed(checked))}
+						aria-label="Held ist geweiht"
+					/>
+				</div>
+
+				{isBlessed && (
+					<div className="flex items-center justify-between gap-4">
+						<div className="text-left">
+							<label htmlFor="tradition" className="font-semibold">
+								Tradition
+							</label>
+							<p className="text-sm text-muted-foreground">
+								Filtert den Liturgienkatalog vor und liefert den Richtwert für die
+								Karmaenergie.
+							</p>
+						</div>
+						<Select
+							value={tradition || ANDERE}
+							onValueChange={(value) => dispatch(setTradition(value === ANDERE ? '' : value))}
+						>
+							<SelectTrigger id="tradition" className="w-44 shrink-0 font-body" aria-label="Tradition wählen">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value={ANDERE} className="font-body">Andere / keine</SelectItem>
+								{/* Eine Tradition aus einer importierten Datei muss der Katalog nicht
+								    kennen. Ohne eigenen Eintrag stünde das Feld leer da, obwohl ein
+								    Wert gesetzt ist – der Spieler sähe nicht, was sein Held ist. */}
+								{tradition !== '' && !TRADITIONEN.includes(tradition) && (
+									<SelectItem value={tradition} className="font-body">
+										{tradition} (unbekannt)
+									</SelectItem>
+								)}
+								{TRADITIONEN.map(name => (
+									<SelectItem key={name} value={name} className="font-body">{name}</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</div>
+				)}
 			</CardContent>
 		</Card>
 	);

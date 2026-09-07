@@ -3,6 +3,7 @@ import {
 	SPELL_COST_TEXT_MAX,
 	SPELL_CAST_TIME_MAX,
 	SPELL_DURATION_MAX,
+	SPELL_NAME_MAX,
 	SPELL_NOTE_MAX,
 	SPELL_PROBE_NOTE_MAX,
 	addSpell,
@@ -120,7 +121,7 @@ describe('spellbookReducer', () => {
 			initialSpellbookState,
 			addSpell(zauber({ name: 'x'.repeat(200), value: 99 }))
 		);
-		expect(state.spells[0].name).toHaveLength(60);
+		expect(state.spells[0].name).toHaveLength(SPELL_NAME_MAX);
 		expect(state.spells[0].value).toBe(25);
 	});
 

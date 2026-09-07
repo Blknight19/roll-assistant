@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
+import { stripControlChars } from '@/utils/text';
 
 export const CHARACTER_NAME_MAX = 40;
 
@@ -17,7 +18,7 @@ export const initialProfileState: ProfileState = {
 };
 
 export const sanitizeCharacterName = (name: string): string =>
-	name.replace(/\s+/g, ' ').trimStart().slice(0, CHARACTER_NAME_MAX);
+	stripControlChars(name).replace(/\s+/g, ' ').trimStart().slice(0, CHARACTER_NAME_MAX);
 
 const profileSlice = createSlice({
 	name: 'profile',

@@ -36,12 +36,24 @@ import {
 	type Spell,
 	type SpellbookState
 } from './spellbookSlice';
+import {
+	LITURGY_LIMIT,
+	clampKap,
+	clampKapCost,
+	initialKarmaState,
+	sanitizeTradition,
+	type KarmaState,
+	type Liturgy
+} from './karmaSlice';
 import { clampTalentValue, initialTalentState, type Talent, type TalentState } from './talentsSlice';
 import { SPELL_CATALOG } from '@/data/spells';
+import { LITURGY_CATALOG } from '@/data/liturgies';
+import { clampDevotionLevel } from '@/data/liturgies/devotion';
+import { stripControlChars } from '@/utils/text';
 
 const STORAGE_KEY = 'dsa-app-state';
 
-export const PERSISTED_VERSION = 4;
+export const PERSISTED_VERSION = 5;
 
 /**
  * Ein Charakter im Dateiformat. Die App verwaltet heute genau einen, das Format trägt
@@ -54,6 +66,7 @@ export type PersistedCharacter = {
 	talents: Pick<Talent, 'id' | 'value'>[];
 	combat: CombatState;
 	spellbook: SpellbookState;
+	karma: KarmaState;
 };
 
 /** Format des localStorage-Blobs ab Version 3. */
@@ -73,6 +86,7 @@ export type PersistedSlices = {
 	talents: TalentState;
 	combat: CombatState;
 	spellbook: SpellbookState;
+	karma: KarmaState;
 	roll: { history: RollHistoryEntry[] };
 	settings: SettingsState;
 };
@@ -133,7 +147,7 @@ export const sanitizeCombat = (raw: unknown): CombatState => {
 	return combat;
 };
 
-const ROLL_TYPES = ['Einzel', 'Talent', 'Kampf', 'Zauber'];
+const ROLL_TYPES = ['Einzel', 'Talent', 'Kampf', 'Zauber', 'Liturgie'];
 
 export const sanitizeHistory = (raw: unknown): RollHistoryEntry[] => {
 	if (!Array.isArray(raw)) return [];
@@ -149,13 +163,24 @@ export const sanitizeHistory = (raw: unknown): RollHistoryEntry[] => {
 			entry.values.length <= ROLL_VALUES_MAX &&
 			entry.values.every(value => isFiniteNumber(value)))
 		.slice(0, HISTORY_LIMIT)
-		.map(entry => ({ ...entry, result: entry.result.slice(0, HISTORY_RESULT_MAX) }));
+		// Feldweise neu aufgebaut: ein Spread schleppte unbekannte Schlüssel der Datei in
+		// den Store und beim nächsten Export wieder hinaus.
+		.map(entry => ({
+			id: entry.id,
+			type: entry.type,
+			values: [...entry.values],
+			result: stripControlChars(entry.result).slice(0, HISTORY_RESULT_MAX),
+			date: entry.date
+		}));
 };
 
 export const sanitizeSettings = (raw: unknown): SettingsState => {
 	const settings = { ...initialSettingsState };
 	if (isRecord(raw) && typeof raw.confirmCriticals === 'boolean') {
 		settings.confirmCriticals = raw.confirmCriticals;
+	}
+	if (isRecord(raw) && typeof raw.noLiturgyFumble === 'boolean') {
+		settings.noLiturgyFumble = raw.noLiturgyFumble;
 	}
 	return settings;
 };
@@ -213,7 +238,7 @@ export const sanitizeSpellbook = (raw: unknown): SpellbookState => {
 				isFiniteNumber(entry.qs) &&
 				entry.qs >= 1 && entry.qs <= 6)
 			.slice(0, SPELL_LIMIT)
-			.map(entry => ({ ...entry, spellName: sanitizeSpellName(entry.spellName) }))
+			.map(entry => ({ id: entry.id, spellName: sanitizeSpellName(entry.spellName), qs: entry.qs }))
 		: [];
 
 	// Bewusst nur `clampAsp`, ohne die Ersteinrichtungs-Auffüllung von `setAsp`: eine
@@ -233,6 +258,87 @@ export const sanitizeSpellbook = (raw: unknown): SpellbookState => {
 		asp,
 		spells,
 		upkeep
+	};
+};
+
+const SEGEN_IDS = new Set(
+	LITURGY_CATALOG.filter(entry => entry.klasse === 'segen').map(entry => entry.id)
+);
+
+/** Wie `sanitizeSpell`: freie Namen und freie Eigenschaften aus einer Datei, der man nicht traut. */
+const sanitizeLiturgy = (raw: unknown): Liturgy | undefined => {
+	if (!isRecord(raw)) return undefined;
+	if (!isId(raw.id)) return undefined;
+	if (raw.klasse !== 'liturgie' && raw.klasse !== 'zeremonie') return undefined;
+	if (typeof raw.name !== 'string') return undefined;
+	if (!Array.isArray(raw.attributes) || raw.attributes.length !== 3) return undefined;
+	if (!raw.attributes.every(isAttributeKey)) return undefined;
+	if (!isFiniteNumber(raw.cost) || !isFiniteNumber(raw.value)) return undefined;
+
+	return {
+		id: raw.id,
+		catalogId: isId(raw.catalogId) ? raw.catalogId : undefined,
+		klasse: raw.klasse,
+		name: sanitizeSpellName(raw.name),
+		attributes: raw.attributes as [AttributeKey, AttributeKey, AttributeKey],
+		cost: clampKapCost(raw.cost),
+		costText: clampSpellText(raw.costText, SPELL_COST_TEXT_MAX),
+		probeNote: clampSpellText(raw.probeNote, SPELL_PROBE_NOTE_MAX),
+		duration: clampSpellText(raw.duration, SPELL_DURATION_MAX),
+		castTime: clampSpellText(raw.castTime, SPELL_CAST_TIME_MAX),
+		value: clampTalentValue(raw.value),
+		note: clampSpellText(raw.note, SPELL_NOTE_MAX)
+	};
+};
+
+export const sanitizeKarma = (raw: unknown): KarmaState => {
+	if (!isRecord(raw)) {
+		return { ...initialKarmaState, kap: { ...initialKarmaState.kap } };
+	}
+
+	const liturgies: Liturgy[] = [];
+	if (Array.isArray(raw.liturgies)) {
+		for (const entry of raw.liturgies.slice(0, LITURGY_LIMIT)) {
+			const liturgy = sanitizeLiturgy(entry);
+			if (liturgy) liturgies.push(liturgy);
+		}
+	}
+
+	// Segen tragen keine eigenen Werte – eine unbekannte id wäre ein Eintrag, den die
+	// App nicht anzeigen könnte.
+	const blessings = Array.isArray(raw.blessings)
+		? [...new Set(
+			raw.blessings.filter((id): id is string => typeof id === 'string' && SEGEN_IDS.has(id))
+		)]
+		: [];
+
+	const upkeep = Array.isArray(raw.upkeep)
+		? raw.upkeep
+			.filter((entry): entry is KarmaState['upkeep'][number] =>
+				isRecord(entry) &&
+				isId(entry.id) &&
+				typeof entry.spellName === 'string' &&
+				isFiniteNumber(entry.qs) &&
+				entry.qs >= 1 && entry.qs <= 6)
+			.slice(0, LITURGY_LIMIT)
+			.map(entry => ({ id: entry.id, spellName: sanitizeSpellName(entry.spellName), qs: entry.qs }))
+		: [];
+
+	const kap = isRecord(raw.kap)
+		? clampKap({
+			current: isFiniteNumber(raw.kap.current) ? raw.kap.current : 0,
+			max: isFiniteNumber(raw.kap.max) ? raw.kap.max : 0
+		})
+		: { current: 0, max: 0 };
+
+	return {
+		isBlessed: raw.isBlessed === true,
+		tradition: typeof raw.tradition === 'string' ? sanitizeTradition(raw.tradition) : '',
+		kap,
+		liturgies,
+		blessings,
+		upkeep,
+		devotionLevel: isFiniteNumber(raw.devotionLevel) ? clampDevotionLevel(raw.devotionLevel) : 0
 	};
 };
 
@@ -285,6 +391,7 @@ export const migratePersisted = (raw: unknown): PersistedSlices | undefined => {
 		talents: { talents: sanitizeTalents(talents) },
 		combat: sanitizeCombat(source.combat),
 		spellbook: fillCastTimes(sanitizeSpellbook(source.spellbook)),
+		karma: sanitizeKarma(source.karma),
 		roll: { history: sanitizeHistory(history) },
 		settings: sanitizeSettings(legacy ? undefined : raw.settings)
 	};
@@ -314,7 +421,8 @@ export const toPersisted = (state: PersistedSlices): PersistedState => ({
 		attributes: state.attributes,
 		talents: state.talents.talents.map(({ id, value }) => ({ id, value })),
 		combat: state.combat,
-		spellbook: state.spellbook
+		spellbook: state.spellbook,
+		karma: state.karma
 	}],
 	history: state.roll.history.slice(0, HISTORY_LIMIT),
 	settings: state.settings

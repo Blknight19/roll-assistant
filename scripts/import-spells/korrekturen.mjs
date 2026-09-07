@@ -25,5 +25,55 @@ export const KORREKTUREN = {
 		felder: {
 			verbreitung: ['Druiden', 'Geoden', 'Gildenmagier', 'Kristallomanten', 'Nachtalben']
 		}
+	},
+	'pech-und-schwefel-strahl': {
+		grund: 'Liturgien kosten KaP; die Quelle schreibt „8 AsP"',
+		felder: { costText: '8 KaP (Kosten sind nicht modifizierbar)', cost: 8 }
+	},
+	'segnung-des-heims': {
+		grund: 'Regelwiki nennt QS Tage; die Quelle noch QS x 3 Stunden',
+		felder: { duration: 'QS Tage' }
+	},
+	erwachen: {
+		grund: 'Boron hat die Aspekte Tod und Traum; Regelwiki nennt Boron (Traum)',
+		felder: { verbreitung: ['Boron (Traum)'] }
+	},
+	geisterfalle: {
+		grund: 'Boron hat die Aspekte Tod und Traum; Regelwiki nennt Tod und Traum',
+		felder: { verbreitung: ['Allgemein-Schamanenritus', 'Boron (Tod)', 'Boron (Traum)'] }
+	},
+	eidechsenegeneration: {
+		grund: 'Tippfehler der Quelle; Regelwiki: Eidechsenregeneration',
+		felder: { name: 'Eidechsenregeneration' }
+	},
+	'eisbaergestalt': {
+		grund: 'Regelwiki: Eisbärengestalt',
+		felder: { name: 'Eisbärengestalt' }
+	},
+	'polarbaerenruf': {
+		grund: 'Regelwiki: Eisbärenruf',
+		felder: { name: 'Eisbärenruf' }
+	},
+	'grosse-waffenweihe': {
+		grund: 'Regelwiki: Große Waffenweihe',
+		felder: { name: 'Große Waffenweihe' }
+	},
+	tabuzone: {
+		grund: 'Regelwiki: Tabu-Zone',
+		felder: { name: 'Tabu-Zone' }
+	},
+	'brazoraghs-krieger': {
+		grund: 'Quelle ohne Verbreitung; Regelwiki: Tairachschamanen (Zauberei)',
+		felder: { verbreitung: ['Tairachschamanen (Zauberei)'] }
+	},
+	ogerruf: {
+		grund: 'Quelle ohne Verbreitung; Regelwiki: Tairachschamanen (Zauberei)',
+		felder: { verbreitung: ['Tairachschamanen (Zauberei)'] }
+	},
+	'herbeirufung-von-tairachs-dienern-nebelkraehen': {
+		grund: 'Quelle ohne Verbreitung; Regelwiki nennt beide Aspekte',
+		felder: {
+			verbreitung: ['Tairachschamanen (Geisterwelt)', 'Tairachschamanen (Zauberei)']
+		}
 	}
 };

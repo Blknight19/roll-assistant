@@ -42,16 +42,19 @@ export const parseProbe = probe => {
 
 /** Spiegelt SPELL_COST_MAX aus src/store/spellbookSlice.ts. */
 export const SPELL_COST_MAX = 99;
+/** Spiegelt LITURGY_COST_MAX aus src/store/karmaSlice.ts – Zeremonien kosten bis 256 KaP. */
+export const LITURGY_COST_MAX = 256;
 
 /** Fester Betrag, optional gefolgt von einem Zusatz, der selbst keine Kosten nennt. */
-const FESTE_KOSTEN = /^(\d+)(?:\s*AsP)?(?:\s*\(([^()]*)\))?$/;
+const FESTE_KOSTEN = /^(\d+)(?:\s*(?:AsP|KaP))?(?:\s*\(([^()]*)\))?$/;
 
 /**
  * Gibt die Zahl nur zurück, wenn der Wortlaut genau einen festen Betrag nennt.
- * Formeln („+ 4 AsP pro Stunde"), Alternativen („bzw.") und Untergrenzen
- * („mindestens") bleiben null – die löst der Spieler beim Übernehmen selbst auf.
+ * Formeln („+ 4 AsP pro Stunde"), Alternativen („bzw."), Untergrenzen („mindestens")
+ * und Teilbeträge („davon 2 permanent") bleiben null – die löst der Spieler beim
+ * Übernehmen selbst auf.
  */
-export const parseCost = kosten => {
+export const parseCost = (kosten, max = SPELL_COST_MAX) => {
 	if (kosten === undefined || kosten.trim() === '') return null;
 
 	const treffer = FESTE_KOSTEN.exec(kosten.replace(/\s+/g, ' ').trim());
@@ -59,18 +62,20 @@ export const parseCost = kosten => {
 	if (/\d/.test(treffer[2] ?? '')) return null;
 
 	const betrag = Number(treffer[1]);
-	if (betrag > SPELL_COST_MAX) {
-		throw new Error(`Kosten über ${SPELL_COST_MAX}: ${JSON.stringify(kosten)}`);
+	if (betrag > max) {
+		throw new Error(`Kosten über ${max}: ${JSON.stringify(kosten)}`);
 	}
 	return betrag;
 };
 
 /**
- * Nur Klassen, die eine Probe kennen. Zaubertricks fehlt sie im Regelwerk, damit
- * fehlen ihnen die drei Eigenschaften, ohne die ein Zauberbucheintrag nicht würfelbar
- * ist. Liturgien und Zeremonien kosten KaP statt AsP und gehören Geweihten.
+ * Klassen mit Probe und AsP. Zaubertricks fehlt die Probe im Regelwerk, damit fehlen
+ * ihnen die drei Eigenschaften, ohne die ein Zauberbucheintrag nicht würfelbar ist.
  */
-export const KLASSEN = ['zauber', 'ritual', 'hexenfluch'];
+export const MAGIE_KLASSEN = ['zauber', 'ritual', 'hexenfluch'];
+/** Klassen der Geweihten. Segen haben keine Probe, aber feste Regelwerte. */
+export const KARMA_KLASSEN = ['liturgie', 'zeremonie', 'segen'];
+export const KLASSEN = [...MAGIE_KLASSEN, ...KARMA_KLASSEN];
 
 /** Geschlossene Liste des Regelwerks – alles andere ist ein Lesefehler. */
 export const MERKMALE = [
@@ -88,8 +93,15 @@ export const MERKMALE = [
 	'Verwandlung'
 ];
 
-/** Feld je Klasse, das die Zauberdauer trägt. Hexenflüche führen keines. */
-const DAUER_FELD = { zauber: 'Zauberdauer', ritual: 'Ritualdauer', hexenfluch: null };
+/** Feld je Klasse, das die Dauer des Wirkens trägt. Hexenflüche und Segen führen keines. */
+const DAUER_FELD = {
+	zauber: 'Zauberdauer',
+	ritual: 'Ritualdauer',
+	hexenfluch: null,
+	liturgie: 'Liturgiedauer',
+	zeremonie: 'Zeremoniedauer',
+	segen: null
+};
 
 /**
  * Das Regelwerk nennt für Hexenflüche keine Dauer je Fluch, sondern eine für alle:
@@ -99,19 +111,27 @@ const DAUER_FELD = { zauber: 'Zauberdauer', ritual: 'Ritualdauer', hexenfluch: n
 const HEXENFLUCH_DAUER = 'mindestens 1 Aktion';
 
 /**
+ * Das Regelwerk nennt für Segen keine eigenen Werte je Eintrag, sondern eine Regel für
+ * alle: „Ihr Wirken kostet jeweils 1 KaP, die Liturgiedauer beträgt 1 Aktion."
+ */
+const SEGEN_DAUER = '1 Aktion';
+const SEGEN_KOSTEN = '1 KaP';
+
+/**
  * Obergrenzen der Textfelder. Sie spiegeln die Konstanten aus
  * src/store/spellbookSlice.ts – der Katalog darf nichts tragen, was das Zauberbuch
  * beim Übernehmen abschneiden würde.
  */
 const LAENGEN = {
-	name: 60,
+	name: 70,
 	probeNote: 90,
 	costText: 160,
 	castTime: 60,
 	range: 60,
-	duration: 80,
+	duration: 120,
 	target: 90,
-	merkmal: 30
+	merkmal: 30,
+	verbreitung: 40
 };
 
 /**
@@ -161,34 +181,35 @@ const pflicht = (roh, schluessel) => {
 	return wert;
 };
 
+/** Trennt an Kommas außerhalb von Klammern: „Boron (Tod), Phex (Schatten)". */
+const splitVerbreitung = text =>
+	text.split(/,\s*(?![^()]*\))/).map(teil => teil.trim()).filter(Boolean);
+
 /** Bildet einen Rohdatensatz auf einen Katalogeintrag ab. Wirft bei allem Unlesbaren. */
 export const toCatalogEntry = roh => {
 	const klasse = pflicht(roh, 'Klasse');
 	if (!KLASSEN.includes(klasse)) throw new Error(`Unbekannte Klasse: ${klasse}`);
+	const karmal = KARMA_KLASSEN.includes(klasse);
 
 	const name = pruefeText(pflicht(roh, 'Name'), 'name');
-	const merkmal = pruefeText(pflicht(roh, 'Merkmal'), 'merkmal');
-	if (!MERKMALE.includes(merkmal)) throw new Error(`Unbekanntes Merkmal: ${merkmal}`);
+	const eintrag = { id: slugify(name), klasse, name };
 
-	const { attributes, probeNote } = parseProbe(pflicht(roh, 'Probe'));
-	const costText = pruefeText(pflicht(roh, 'AsP-Kosten'), 'costText');
-	const duration = pruefeText(normalisiereDuration(pflicht(roh, 'Wirkungsdauer')), 'duration');
+	if (klasse !== 'segen') {
+		const { attributes, probeNote } = parseProbe(pflicht(roh, 'Probe'));
+		eintrag.attributes = attributes;
+		if (probeNote !== undefined) eintrag.probeNote = pruefeText(probeNote, 'probeNote');
+	}
 
-	const eintrag = {
-		id: slugify(name),
-		klasse,
-		name,
-		attributes,
-		cost: parseCost(costText),
-		costText,
-		duration,
-		merkmal
-	};
-
-	if (probeNote !== undefined) eintrag.probeNote = pruefeText(probeNote, 'probeNote');
+	const costText = klasse === 'segen'
+		? SEGEN_KOSTEN
+		: pruefeText(pflicht(roh, karmal ? 'KaP-Kosten' : 'AsP-Kosten'), 'costText');
+	eintrag.cost = parseCost(costText, karmal ? LITURGY_COST_MAX : SPELL_COST_MAX);
+	eintrag.costText = costText;
 
 	const dauerFeld = DAUER_FELD[klasse];
-	const castTime = dauerFeld === null ? HEXENFLUCH_DAUER : feld(roh, dauerFeld);
+	const castTime = klasse === 'hexenfluch'
+		? HEXENFLUCH_DAUER
+		: klasse === 'segen' ? SEGEN_DAUER : feld(roh, dauerFeld);
 	if (castTime !== undefined) {
 		eintrag.castTime = pruefeText(normalisiereCastTime(castTime), 'castTime');
 	}
@@ -196,12 +217,28 @@ export const toCatalogEntry = roh => {
 	const range = feld(roh, 'Reichweite');
 	if (range !== undefined) eintrag.range = pruefeText(range, 'range');
 
+	eintrag.duration = pruefeText(normalisiereDuration(pflicht(roh, 'Wirkungsdauer')), 'duration');
+
 	const target = feld(roh, 'Zielkategorie');
 	if (target !== undefined) eintrag.target = pruefeText(target, 'target');
 
-	const verbreitung = feld(roh, 'Verbreitung');
-	if (verbreitung !== undefined) {
-		eintrag.verbreitung = verbreitung.split(',').map(teil => pruefeText(teil.trim(), 'merkmal'));
+	if (karmal) {
+		// Fehlt die Verbreitung, bleibt sie leer: erst nach `applyKorrektur` wird geprüft,
+		// damit eine Korrektur sie nachtragen kann.
+		const verbreitung = klasse === 'segen' ? 'Allgemein' : feld(roh, 'Verbreitung');
+		eintrag.verbreitung = verbreitung === undefined
+			? []
+			: splitVerbreitung(verbreitung).map(teil =>
+				pruefeText(normalisiereVerbreitung(teil), 'verbreitung'));
+	} else {
+		const merkmal = pruefeText(pflicht(roh, 'Merkmal'), 'merkmal');
+		if (!MERKMALE.includes(merkmal)) throw new Error(`Unbekanntes Merkmal: ${merkmal}`);
+		eintrag.merkmal = merkmal;
+
+		const verbreitung = feld(roh, 'Verbreitung');
+		if (verbreitung !== undefined) {
+			eintrag.verbreitung = splitVerbreitung(verbreitung).map(teil => pruefeText(teil, 'merkmal'));
+		}
 	}
 
 	return eintrag;
@@ -246,9 +283,9 @@ const alsEintrag = eintrag => {
 };
 
 /** Erzeugt den Quelltext einer Katalogdatei. */
-export const renderModule = (exportName, eintraege) =>
-	`import type { SpellCatalogEntry } from './types';\n\n` +
-	`export const ${exportName}: SpellCatalogEntry[] = [\n` +
+export const renderModule = (exportName, eintraege, typeName = 'SpellCatalogEntry') =>
+	`import type { ${typeName} } from './types';\n\n` +
+	`export const ${exportName}: ${typeName}[] = [\n` +
 	`${eintraege.map(alsEintrag).join(',\n')}\n];\n`;
 
 /**
@@ -287,3 +324,10 @@ export const normalisiereCastTime = castTime =>
  * kein Begriff des Regelwerks – ohne diese Korrektur stünde am Spieltisch Unsinn.
  */
 export const normalisiereDuration = duration => duration.replace(/\bOS\b/g, 'QS');
+
+/**
+ * Die Quelle führt die Tahayaschamanen unter ihrem früheren Namen „Mohaschamanen". Der
+ * Name steht im Traditionsfilter des Liturgienbuchs, muss also der aktuellen Fassung
+ * des Regelwerks folgen.
+ */
+export const normalisiereVerbreitung = paar => paar.replace(/^Mohaschamanen\b/, 'Tahayaschamanen');

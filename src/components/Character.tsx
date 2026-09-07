@@ -5,17 +5,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import PropertyNumber from './PropertyNumber';
 import TalentRow, { TalentListItem } from './TalentRow';
-import Spellbook from './Spellbook';
+import CastingBooks from './CastingBooks';
 import type { RootState } from '@/store';
 import { ATTRIBUTE_KEYS, ATTRIBUTE_MAX, ATTRIBUTE_MIN, setAttribute } from '@/store/attributesSlice';
 import { updateTalent } from '@/store/talentsSlice';
-import { User, Sparkles, BookOpen } from 'lucide-react';
+import { useCastingDomains } from '@/hooks/useCastingDomains';
+import { User, Sparkles } from 'lucide-react';
 
 const Character = () => {
 	const dispatch = useDispatch();
 	const attributes = useSelector((state: RootState) => state.attributes);
 	const talents = useSelector((state: RootState) => state.talents.talents);
-	const isSpellcaster = useSelector((state: RootState) => state.spellbook.isSpellcaster);
+	const domains = useCastingDomains();
+	const CastingIcon = domains.icon;
 
 	// Über dreißig Zeilen sind ohne Suche nicht zu überblicken – der Wurf-Tab hat
 	// sie längst, der Charakterbogen bisher nicht.
@@ -33,7 +35,7 @@ const Character = () => {
 	return (
 		<div className="w-full max-w-6xl mx-auto">
 			<Tabs defaultValue="attributes" className="w-full">
-				<TabsList className={`grid w-full ${isSpellcaster ? 'grid-cols-3' : 'grid-cols-2'} h-auto mb-6`}>
+				<TabsList className={`grid w-full ${domains.any ? 'grid-cols-3' : 'grid-cols-2'} h-auto mb-6`}>
 					<TabsTrigger value="attributes" className="font-heading flex flex-col items-center gap-1 py-2" aria-label="Eigenschaften">
 						<User className="w-4 h-4" />
 						<span className="text-[11px] sm:text-xs leading-none">Eigenschaften</span>
@@ -42,10 +44,10 @@ const Character = () => {
 						<Sparkles className="w-4 h-4" />
 						<span className="text-[11px] sm:text-xs leading-none">Talente</span>
 					</TabsTrigger>
-					{isSpellcaster && (
-						<TabsTrigger value="spellbook" className="font-heading flex flex-col items-center gap-1 py-2" aria-label="Zauberbuch">
-							<BookOpen className="w-4 h-4" />
-							<span className="text-[11px] sm:text-xs leading-none">Zauberbuch</span>
+					{domains.any && (
+						<TabsTrigger value="casting" className="font-heading flex flex-col items-center gap-1 py-2" aria-label={domains.bookLabel}>
+							<CastingIcon className="w-4 h-4" />
+							<span className="text-[11px] sm:text-xs leading-none">{domains.bookLabel}</span>
 						</TabsTrigger>
 					)}
 				</TabsList>
@@ -142,9 +144,9 @@ const Character = () => {
 					</Card>
 				</TabsContent>
 
-				{isSpellcaster && (
-					<TabsContent value="spellbook">
-						<Spellbook />
+				{domains.any && (
+					<TabsContent value="casting">
+						<CastingBooks />
 					</TabsContent>
 				)}
 

@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type { AttributeKey } from './attributesSlice';
 import { clampTalentValue } from './talentsSlice';
+import { stripControlChars } from '@/utils/text';
 
 /** Ein Zauber im Zauberbuch des Helden. Katalogeinträge werden hier hinein kopiert. */
 export type Spell = {
@@ -36,7 +37,11 @@ export type SpellbookState = {
 	upkeep: UpkeepEntry[];
 };
 
-export const SPELL_NAME_MAX = 60;
+/**
+ * Deckt auch den längsten Katalognamen ab: „Herbeirufung der Heerscharen des
+ * Rattenkindes (Vampirfledermäuse)" braucht 65 Zeichen.
+ */
+export const SPELL_NAME_MAX = 70;
 /** Weit über jedem gespielten Magier – Grenze gegen präparierte Importdateien. */
 export const SPELL_LIMIT = 100;
 export const SPELL_COST_MAX = 99;
@@ -49,7 +54,7 @@ export const ASP_MAX = 999;
  */
 export const SPELL_COST_TEXT_MAX = 160;
 export const SPELL_PROBE_NOTE_MAX = 90;
-export const SPELL_DURATION_MAX = 80;
+export const SPELL_DURATION_MAX = 120;
 export const SPELL_CAST_TIME_MAX = 60;
 export const SPELL_NOTE_MAX = 500;
 
@@ -73,7 +78,7 @@ export const clampAsp = ({ current, max }: AspState): AspState => {
 };
 
 export const sanitizeSpellName = (name: string): string =>
-	name.replace(/\s+/g, ' ').trimStart().slice(0, SPELL_NAME_MAX);
+	stripControlChars(name).replace(/\s+/g, ' ').trimStart().slice(0, SPELL_NAME_MAX);
 
 export const clampSpellCost = (value: number): number =>
 	Math.min(SPELL_COST_MAX, Math.max(0, Math.round(value)));
@@ -83,7 +88,7 @@ export const clampSpellCost = (value: number): number =>
  * Import dieselbe Funktion benutzen kann: alles, was kein String ist, entfällt.
  */
 export const clampSpellText = (value: unknown, max: number): string | undefined =>
-	typeof value === 'string' ? value.slice(0, max) : undefined;
+	typeof value === 'string' ? stripControlChars(value).slice(0, max) : undefined;
 
 const normalizeSpell = (spell: Spell): Spell => ({
 	...spell,

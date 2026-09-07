@@ -15,15 +15,25 @@ export type TalentCheckResult = {
   special: Special;
 };
 
+export type CheckOptions = {
+  /** Optionalregel „Keine Patzer bei Liturgien": zwei Zwanzigen sind gewöhnliche Würfel. */
+  ignoreFumble?: boolean;
+};
+
+/** Qualitätsstufe 1-6 aus den übrigen Fertigkeitspunkten. */
+const qsFor = (fp: number): number => Math.min(6, Math.max(1, Math.ceil(fp / 3)));
+
 export const evaluateTalentCheck = (
   attrs: [number, number, number],
   taw: number,
   modifier: number,
   dice: [number, number, number],
+  options: CheckOptions = {},
 ): TalentCheckResult => {
   const ones = dice.filter(d => d === 1).length;
   const twenties = dice.filter(d => d === 20).length;
-  const special: Special = ones >= 2 ? 'krit' : twenties >= 2 ? 'patzer' : null;
+  const special: Special =
+    ones >= 2 ? 'krit' : twenties >= 2 && !options.ignoreFumble ? 'patzer' : null;
 
   const perDieShortfall = dice.map((die, i) => Math.min(0, attrs[i] + modifier - die)) as [
     number,
@@ -33,9 +43,17 @@ export const evaluateTalentCheck = (
   const fp = taw + perDieShortfall.reduce((sum, v) => sum + v, 0);
 
   const success = special === 'krit' || (special !== 'patzer' && fp >= 0);
-  const qs = Math.min(6, Math.max(1, Math.ceil(fp / 3)));
 
-  return { dice, perDieShortfall, fp, success, qs, special };
+  return { dice, perDieShortfall, fp, success, qs: qsFor(fp), special };
+};
+
+/**
+ * Kritischer Erfolg bei Liturgien: „Wenn es für den Geweihten nützlich ist, können 1W6
+ * Punkte auf die FP addiert werden." Die QS folgt den neuen FP.
+ */
+export const withBonusFp = (result: TalentCheckResult, bonus: number): TalentCheckResult => {
+  const fp = result.fp + Math.max(0, Math.trunc(bonus));
+  return { ...result, fp, qs: qsFor(fp) };
 };
 
 export type CombatRollResult = {
@@ -92,12 +110,12 @@ export const evaluateCombatRoll = (
 };
 
 /**
- * Fällige AsP nach Ausgang der Zauberprobe. Volle Kosten nur beim schlichten Erfolg;
- * misslungene Proben kosten laut Regelwerk „die Hälfte der Astralenergie", ein
- * kritischer Erfolg ebenfalls. Ohne Rundungsregel im Buch wird aufgerundet – das ist
- * die verbreitete Auslegung und für den Helden die teurere, also die sichere.
+ * Fällige Punkte (AsP oder KaP) nach Ausgang der Probe. Volle Kosten nur beim schlichten
+ * Erfolg; misslungene Proben kosten laut Regelwerk „die Hälfte", ein kritischer Erfolg
+ * ebenfalls. Ohne Rundungsregel im Buch wird aufgerundet – das ist die verbreitete
+ * Auslegung und für den Helden die teurere, also die sichere.
  */
-export const spellAspCost = (cost: number, result: TalentCheckResult): number => {
+export const castingCost = (cost: number, result: TalentCheckResult): number => {
   const base = Math.max(0, Math.round(cost));
   const halved = result.special === 'krit' || !result.success;
   return halved ? Math.ceil(base / 2) : base;

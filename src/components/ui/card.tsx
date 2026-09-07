@@ -13,6 +13,7 @@ const cardVariants = cva(
         failure: 'bg-failure/10 border-failure',
         critical: 'bg-critical/10 border-critical',
         magic: 'bg-magic/10 border-magic',
+        karma: 'bg-karma/10 border-karma',
       },
     },
     defaultVariants: {

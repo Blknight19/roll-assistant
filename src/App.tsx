@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Toaster } from '@/components/ui/sonner';
 import TalentRoll from './components/TalentRoll';
-import SpellRoll from './components/SpellRoll';
+import CastingTab from './components/CastingTab';
 import SimpleRoll from './components/SimpleRoll';
 import RollHistory from './components/RollHistory';
 import ThemeToggle from './components/ThemeToggle';
@@ -11,31 +10,36 @@ import SettingsDialog from './components/SettingsDialog';
 import Character from './components/Character';
 import Combat from './components/Combat';
 import HeroBar from './components/HeroBar';
-import type { RootState } from '@/store';
+import { useCastingDomains } from '@/hooks/useCastingDomains';
 import { Scroll, Dices, History, User, Swords, Wand2 } from 'lucide-react';
 
 // Talent und Kampf stehen bewusst nebeneinander – dazwischen wird am Tisch am
-// häufigsten gewechselt. Magie sitzt daneben, weil ein Magier zwischen Zauber und
-// Kampf genauso oft springt.
+// häufigsten gewechselt. Der Wirken-Slot sitzt daneben, weil Zauberer und Geweihte
+// zwischen Wirken und Kampf genauso oft springen. Label und Icon des Slots liefert
+// `useCastingDomains`; `Wand2` steht hier nur als Platzhalter.
 const allTabs = [
   { value: 'talentRoll', label: 'Talent', icon: Scroll },
   { value: 'combat', label: 'Kampf', icon: Swords },
-  { value: 'spellRoll', label: 'Magie', icon: Wand2, magic: true },
+  { value: 'casting', label: 'Magie', icon: Wand2, casting: true },
   { value: 'simpleRoll', label: 'Einzel', icon: Dices },
   { value: 'history', label: 'Historie', icon: History },
   { value: 'character', label: 'Held', icon: User },
 ];
 
 function App() {
-  const isSpellcaster = useSelector((state: RootState) => state.spellbook.isSpellcaster);
-  const tabs = allTabs.filter(tab => !tab.magic || isSpellcaster);
+  const domains = useCastingDomains();
+  const tabs = allTabs
+    .filter(entry => !entry.casting || domains.any)
+    .map(entry => entry.casting
+      ? { ...entry, label: domains.tabLabel, icon: domains.icon }
+      : entry);
 
   const [tab, setTab] = useState('talentRoll');
 
-  // Der Magie-Tab kann verschwinden, während er offen ist.
+  // Der Wirken-Slot kann verschwinden, während er offen ist.
   useEffect(() => {
-    if (!isSpellcaster && tab === 'spellRoll') setTab('talentRoll');
-  }, [isSpellcaster, tab]);
+    if (!domains.any && tab === 'casting') setTab('talentRoll');
+  }, [domains.any, tab]);
 
   return (
     <>
@@ -67,7 +71,7 @@ function App() {
           <div className='w-full max-w-6xl'>
             <Tabs value={tab} onValueChange={setTab} className="w-full">
               <TabsList
-                className={`grid w-full ${isSpellcaster ? 'grid-cols-6' : 'grid-cols-5'} h-auto mb-4 bg-aventurian-100 dark:bg-aventurian-800`}
+                className={`grid w-full ${domains.any ? 'grid-cols-6' : 'grid-cols-5'} h-auto mb-4 bg-aventurian-100 dark:bg-aventurian-800`}
               >
                 {tabs.map(({ value, label, icon: Icon }) => (
                   <TabsTrigger
@@ -90,9 +94,9 @@ function App() {
               <TabsContent value="combat" className="mt-0">
                 <Combat />
               </TabsContent>
-              {isSpellcaster && (
-                <TabsContent value="spellRoll" className="mt-0">
-                  <SpellRoll />
+              {domains.any && (
+                <TabsContent value="casting" className="mt-0">
+                  <CastingTab />
                 </TabsContent>
               )}
               <TabsContent value="simpleRoll" className="mt-0">

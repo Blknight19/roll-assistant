@@ -2,12 +2,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import type { RootState } from '@/store';
-import { setConfirmCriticals } from '@/store/settingsSlice';
+import { setConfirmCriticals, setNoLiturgyFumble } from '@/store/settingsSlice';
 import { Scale } from 'lucide-react';
 
 const RulesSettings = () => {
 	const dispatch = useDispatch();
 	const confirmCriticals = useSelector((state: RootState) => state.settings.confirmCriticals);
+	const noLiturgyFumble = useSelector((state: RootState) => state.settings.noLiturgyFumble);
 
 	return (
 		<Card variant="parchment">
@@ -17,7 +18,7 @@ const RulesSettings = () => {
 					Regeln
 				</CardTitle>
 			</CardHeader>
-			<CardContent>
+			<CardContent className="space-y-5">
 				<div className="flex items-center justify-between gap-4">
 					<div className="text-left">
 						<label htmlFor="confirm-criticals" className="font-semibold">
@@ -33,6 +34,24 @@ const RulesSettings = () => {
 						checked={confirmCriticals}
 						onCheckedChange={(checked) => dispatch(setConfirmCriticals(checked))}
 						aria-label="Bestätigungswurf bei Kritisch und Patzer"
+					/>
+				</div>
+
+				<div className="flex items-center justify-between gap-4">
+					<div className="text-left">
+						<label htmlFor="no-liturgy-fumble" className="font-semibold">
+							Keine Patzer bei Liturgien
+						</label>
+						<p className="text-sm text-muted-foreground">
+							Optionalregel: Zwei Zwanzigen zählen bei Liturgien und Zeremonien wie
+							gewöhnliche Würfel. Zwei Einsen bleiben ein kritischer Erfolg.
+						</p>
+					</div>
+					<Switch
+						id="no-liturgy-fumble"
+						checked={noLiturgyFumble}
+						onCheckedChange={(checked) => dispatch(setNoLiturgyFumble(checked))}
+						aria-label="Keine Patzer bei Liturgien"
 					/>
 				</div>
 			</CardContent>
