@@ -2,6 +2,11 @@ import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type { AttributeKey } from './attributesSlice';
 
+export type TalentGroup = 'koerper' | 'gesellschaft' | 'natur' | 'wissen' | 'handwerk';
+
+/** Belastungsspalte des Regelwiki: „Evtl." entscheidet die Szene, nicht der Held. */
+export type TalentEncumbrance = 'ja' | 'evtl' | 'nein';
+
 export type Talent = {
 	id: string;
 	name: string;
@@ -9,73 +14,83 @@ export type Talent = {
 	attribute2: AttributeKey;
 	attribute3: AttributeKey;
 	value: number;
+	group: TalentGroup;
+	be: TalentEncumbrance;
 }
 
 export type TalentState = {
 	talents: Talent[]
 }
 
+const talent = (
+	id: string,
+	name: string,
+	[attribute1, attribute2, attribute3]: [AttributeKey, AttributeKey, AttributeKey],
+	group: TalentGroup,
+	be: TalentEncumbrance
+): Talent => ({ id, name, attribute1, attribute2, attribute3, value: 0, group, be });
+
 export const initialTalentState: TalentState = {
 	talents: [
-		{ id: '1', name: 'Fliegen', attribute1: 'MU', attribute2: 'IN', attribute3: 'GE', value: 0 },
-		{ id: '2', name: 'Gaukeleien', attribute1: 'MU', attribute2: 'CH', attribute3: 'FF', value: 0 },
-		{ id: '3', name: 'Klettern', attribute1: 'MU', attribute2: 'GE', attribute3: 'KK', value: 0 },
-		{ id: '4', name: 'Körperbeherrschung', attribute1: 'GE', attribute2: 'GE', attribute3: 'KO', value: 0 },
-		{ id: '5', name: 'Kraftakt', attribute1: 'KO', attribute2: 'KK', attribute3: 'KK', value: 0 },
-		{ id: '6', name: 'Reiten', attribute1: 'CH', attribute2: 'GE', attribute3: 'KK', value: 0 },
-		{ id: '7', name: 'Schwimmen', attribute1: 'GE', attribute2: 'KO', attribute3: 'KK', value: 0 },
-		{ id: '8', name: 'Selbstbeherrschung', attribute1: 'MU', attribute2: 'MU', attribute3: 'KO', value: 0 },
-		{ id: '9', name: 'Singen', attribute1: 'KL', attribute2: 'CH', attribute3: 'KO', value: 0 },
-		{ id: '10', name: 'Sinnesschärfe', attribute1: 'KL', attribute2: 'IN', attribute3: 'IN', value: 0 },
-		{ id: '11', name: 'Tanzen', attribute1: 'KL', attribute2: 'CH', attribute3: 'GE', value: 0 },
-		{ id: '12', name: 'Taschendiebstahl', attribute1: 'MU', attribute2: 'FF', attribute3: 'GE', value: 0 },
-		{ id: '13', name: 'Verbergen', attribute1: 'MU', attribute2: 'IN', attribute3: 'GE', value: 0 },
-		{ id: '14', name: 'Zechen', attribute1: 'KL', attribute2: 'KO', attribute3: 'KK', value: 0 },
-		{ id: '15', name: 'Bekehren & Überzeugen', attribute1: 'MU', attribute2: 'KL', attribute3: 'CH', value: 0 },
-		{ id: '16', name: 'Betören', attribute1: 'MU', attribute2: 'CH', attribute3: 'CH', value: 0 },
-		{ id: '17', name: 'Einschüchtern', attribute1: 'MU', attribute2: 'IN', attribute3: 'CH', value: 0 },
-		{ id: '18', name: 'Etikette', attribute1: 'KL', attribute2: 'IN', attribute3: 'CH', value: 0 },
-		{ id: '19', name: 'Gassenwissen', attribute1: 'KL', attribute2: 'IN', attribute3: 'CH', value: 0 },
-		{ id: '20', name: 'Menschenkenntnis', attribute1: 'KL', attribute2: 'IN', attribute3: 'CH', value: 0 },
-		{ id: '21', name: 'Überreden', attribute1: 'MU', attribute2: 'IN', attribute3: 'CH', value: 0 },
-		{ id: '22', name: 'Verkleiden', attribute1: 'IN', attribute2: 'CH', attribute3: 'GE', value: 0 },
-		{ id: '23', name: 'Willenskraft', attribute1: 'MU', attribute2: 'IN', attribute3: 'CH', value: 0 },
-		{ id: '24', name: 'Fährtensuche', attribute1: 'MU', attribute2: 'IN', attribute3: 'GE', value: 0 },
-		{ id: '25', name: 'Fesseln', attribute1: 'KL', attribute2: 'FF', attribute3: 'KK', value: 0 },
-		{ id: '26', name: 'Fischen & Angeln', attribute1: 'FF', attribute2: 'GE', attribute3: 'KO', value: 0 },
-		{ id: '27', name: 'Orientierung', attribute1: 'KL', attribute2: 'IN', attribute3: 'IN', value: 0 },
-		{ id: '28', name: 'Pflanzenkunde', attribute1: 'KL', attribute2: 'FF', attribute3: 'KO', value: 0 },
-		{ id: '29', name: 'Tierkunde', attribute1: 'MU', attribute2: 'MU', attribute3: 'CH', value: 0 },
-		{ id: '30', name: 'Wildnisleben', attribute1: 'MU', attribute2: 'GE', attribute3: 'KO', value: 0 },
-		{ id: '31', name: 'Brett- & Glücksspiel', attribute1: 'KL', attribute2: 'KL', attribute3: 'IN', value: 0 },
-		{ id: '32', name: 'Geographie', attribute1: 'KL', attribute2: 'KL', attribute3: 'IN', value: 0 },
-		{ id: '33', name: 'Geschichtswissen', attribute1: 'KL', attribute2: 'KL', attribute3: 'IN', value: 0 },
-		{ id: '34', name: 'Götter & Kulte', attribute1: 'KL', attribute2: 'KL', attribute3: 'IN', value: 0 },
-		{ id: '35', name: 'Kriegskunst', attribute1: 'MU', attribute2: 'KL', attribute3: 'IN', value: 0 },
-		{ id: '36', name: 'Magiekunde', attribute1: 'KL', attribute2: 'KL', attribute3: 'IN', value: 0 },
-		{ id: '37', name: 'Mechanik', attribute1: 'KL', attribute2: 'KL', attribute3: 'FF', value: 0 },
-		{ id: '38', name: 'Rechnen', attribute1: 'KL', attribute2: 'KL', attribute3: 'IN', value: 0 },
-		{ id: '39', name: 'Rechtskunde', attribute1: 'KL', attribute2: 'KL', attribute3: 'IN', value: 0 },
-		{ id: '40', name: 'Sagen & Legenden', attribute1: 'KL', attribute2: 'KL', attribute3: 'IN', value: 0 },
-		{ id: '41', name: 'Sphärenkunde', attribute1: 'KL', attribute2: 'KL', attribute3: 'IN', value: 0 },
-		{ id: '42', name: 'Sternkunde', attribute1: 'KL', attribute2: 'KL', attribute3: 'IN', value: 0 },
-		{ id: '43', name: 'Alchemie', attribute1: 'MU', attribute2: 'KL', attribute3: 'FF', value: 0 },
-		{ id: '44', name: 'Boote & Schiffe', attribute1: 'FF', attribute2: 'GE', attribute3: 'KK', value: 0 },
-		{ id: '45', name: 'Fahrzeuge', attribute1: 'CH', attribute2: 'FF', attribute3: 'KO', value: 0 },
-		{ id: '46', name: 'Handel', attribute1: 'KL', attribute2: 'IN', attribute3: 'CH', value: 0 },
-		{ id: '47', name: 'Heilkunde Gift', attribute1: 'MU', attribute2: 'KL', attribute3: 'IN', value: 0 },
-		{ id: '48', name: 'Heilkunde Krankheiten', attribute1: 'MU', attribute2: 'IN', attribute3: 'KO', value: 0 },
-		{ id: '49', name: 'Heilkunde Seele', attribute1: 'IN', attribute2: 'CH', attribute3: 'KO', value: 0 },
-		{ id: '50', name: 'Heilkunde Wunden', attribute1: 'KL', attribute2: 'FF', attribute3: 'FF', value: 0 },
-		{ id: '51', name: 'Holzbearbeitung', attribute1: 'FF', attribute2: 'GE', attribute3: 'KK', value: 0 },
-		{ id: '52', name: 'Lebensmittelbearbeitung', attribute1: 'IN', attribute2: 'FF', attribute3: 'FF', value: 0 },
-		{ id: '53', name: 'Lederbearbeitung', attribute1: 'FF', attribute2: 'GE', attribute3: 'KO', value: 0 },
-		{ id: '54', name: 'Malen & Zeichnen', attribute1: 'IN', attribute2: 'FF', attribute3: 'FF', value: 0 },
-		{ id: '55', name: 'Metallbearbeitung', attribute1: 'FF', attribute2: 'KO', attribute3: 'KK', value: 0 },
-		{ id: '56', name: 'Musizieren', attribute1: 'CH', attribute2: 'FF', attribute3: 'KO', value: 0 },
-		{ id: '57', name: 'Schlösserknacken', attribute1: 'IN', attribute2: 'FF', attribute3: 'FF', value: 0 },
-		{ id: '58', name: 'Steinbearbeitung', attribute1: 'FF', attribute2: 'FF', attribute3: 'KK', value: 0 },
-		{ id: '59', name: 'Stoffbearbeitung', attribute1: 'KL', attribute2: 'FF', attribute3: 'FF', value: 0 }
+		talent('1', 'Fliegen', ['MU', 'IN', 'GE'], 'koerper', 'ja'),
+		talent('2', 'Gaukeleien', ['MU', 'CH', 'FF'], 'koerper', 'ja'),
+		talent('3', 'Klettern', ['MU', 'GE', 'KK'], 'koerper', 'ja'),
+		talent('4', 'Körperbeherrschung', ['GE', 'GE', 'KO'], 'koerper', 'ja'),
+		talent('5', 'Kraftakt', ['KO', 'KK', 'KK'], 'koerper', 'ja'),
+		talent('6', 'Reiten', ['CH', 'GE', 'KK'], 'koerper', 'ja'),
+		talent('7', 'Schwimmen', ['GE', 'KO', 'KK'], 'koerper', 'ja'),
+		talent('8', 'Selbstbeherrschung', ['MU', 'MU', 'KO'], 'koerper', 'nein'),
+		talent('9', 'Singen', ['KL', 'CH', 'KO'], 'koerper', 'evtl'),
+		talent('10', 'Sinnesschärfe', ['KL', 'IN', 'IN'], 'koerper', 'evtl'),
+		talent('11', 'Tanzen', ['KL', 'CH', 'GE'], 'koerper', 'ja'),
+		talent('12', 'Taschendiebstahl', ['MU', 'FF', 'GE'], 'koerper', 'ja'),
+		talent('13', 'Verbergen', ['MU', 'IN', 'GE'], 'koerper', 'ja'),
+		talent('14', 'Zechen', ['KL', 'KO', 'KK'], 'koerper', 'nein'),
+		talent('15', 'Bekehren & Überzeugen', ['MU', 'KL', 'CH'], 'gesellschaft', 'nein'),
+		talent('16', 'Betören', ['MU', 'CH', 'CH'], 'gesellschaft', 'nein'),
+		talent('17', 'Einschüchtern', ['MU', 'IN', 'CH'], 'gesellschaft', 'nein'),
+		talent('18', 'Etikette', ['KL', 'IN', 'CH'], 'gesellschaft', 'nein'),
+		talent('19', 'Gassenwissen', ['KL', 'IN', 'CH'], 'gesellschaft', 'nein'),
+		talent('20', 'Menschenkenntnis', ['KL', 'IN', 'CH'], 'gesellschaft', 'nein'),
+		talent('21', 'Überreden', ['MU', 'IN', 'CH'], 'gesellschaft', 'nein'),
+		talent('22', 'Verkleiden', ['IN', 'CH', 'GE'], 'gesellschaft', 'ja'),
+		talent('23', 'Willenskraft', ['MU', 'IN', 'CH'], 'gesellschaft', 'nein'),
+		talent('24', 'Fährtensuche', ['MU', 'IN', 'GE'], 'natur', 'ja'),
+		talent('25', 'Fesseln', ['KL', 'FF', 'KK'], 'natur', 'nein'),
+		talent('26', 'Fischen & Angeln', ['FF', 'GE', 'KO'], 'natur', 'evtl'),
+		talent('27', 'Orientierung', ['KL', 'IN', 'IN'], 'natur', 'nein'),
+		talent('28', 'Pflanzenkunde', ['KL', 'FF', 'KO'], 'natur', 'evtl'),
+		talent('29', 'Tierkunde', ['MU', 'MU', 'CH'], 'natur', 'ja'),
+		talent('30', 'Wildnisleben', ['MU', 'GE', 'KO'], 'natur', 'ja'),
+		talent('31', 'Brett- & Glücksspiel', ['KL', 'KL', 'IN'], 'wissen', 'nein'),
+		talent('32', 'Geographie', ['KL', 'KL', 'IN'], 'wissen', 'nein'),
+		talent('33', 'Geschichtswissen', ['KL', 'KL', 'IN'], 'wissen', 'nein'),
+		talent('34', 'Götter & Kulte', ['KL', 'KL', 'IN'], 'wissen', 'nein'),
+		talent('35', 'Kriegskunst', ['MU', 'KL', 'IN'], 'wissen', 'nein'),
+		talent('36', 'Magiekunde', ['KL', 'KL', 'IN'], 'wissen', 'nein'),
+		talent('37', 'Mechanik', ['KL', 'KL', 'FF'], 'wissen', 'nein'),
+		talent('38', 'Rechnen', ['KL', 'KL', 'IN'], 'wissen', 'nein'),
+		talent('39', 'Rechtskunde', ['KL', 'KL', 'IN'], 'wissen', 'nein'),
+		talent('40', 'Sagen & Legenden', ['KL', 'KL', 'IN'], 'wissen', 'nein'),
+		talent('41', 'Sphärenkunde', ['KL', 'KL', 'IN'], 'wissen', 'nein'),
+		talent('42', 'Sternkunde', ['KL', 'KL', 'IN'], 'wissen', 'nein'),
+		talent('43', 'Alchemie', ['MU', 'KL', 'FF'], 'handwerk', 'ja'),
+		talent('44', 'Boote & Schiffe', ['FF', 'GE', 'KK'], 'handwerk', 'ja'),
+		talent('45', 'Fahrzeuge', ['CH', 'FF', 'KO'], 'handwerk', 'ja'),
+		talent('46', 'Handel', ['KL', 'IN', 'CH'], 'handwerk', 'nein'),
+		talent('47', 'Heilkunde Gift', ['MU', 'KL', 'IN'], 'handwerk', 'ja'),
+		talent('48', 'Heilkunde Krankheiten', ['MU', 'IN', 'KO'], 'handwerk', 'ja'),
+		talent('49', 'Heilkunde Seele', ['IN', 'CH', 'KO'], 'handwerk', 'nein'),
+		talent('50', 'Heilkunde Wunden', ['KL', 'FF', 'FF'], 'handwerk', 'ja'),
+		talent('51', 'Holzbearbeitung', ['FF', 'GE', 'KK'], 'handwerk', 'ja'),
+		talent('52', 'Lebensmittelbearbeitung', ['IN', 'FF', 'FF'], 'handwerk', 'ja'),
+		talent('53', 'Lederbearbeitung', ['FF', 'GE', 'KO'], 'handwerk', 'ja'),
+		talent('54', 'Malen & Zeichnen', ['IN', 'FF', 'FF'], 'handwerk', 'ja'),
+		talent('55', 'Metallbearbeitung', ['FF', 'KO', 'KK'], 'handwerk', 'ja'),
+		talent('56', 'Musizieren', ['CH', 'FF', 'KO'], 'handwerk', 'ja'),
+		talent('57', 'Schlösserknacken', ['IN', 'FF', 'FF'], 'handwerk', 'ja'),
+		talent('58', 'Steinbearbeitung', ['FF', 'FF', 'KK'], 'handwerk', 'ja'),
+		talent('59', 'Stoffbearbeitung', ['KL', 'FF', 'FF'], 'handwerk', 'ja')
 	]
 };
 
