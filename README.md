@@ -13,7 +13,9 @@ Ein digitaler Würfelassistent und Charakterbogen.
 - **Segen** als Knopfleiste: ein Tipp bucht 1 KaP und protokolliert den Segen ohne Wurf
 - **Umstände** als benannte Modifikatoren: Ort und Zeit der Zeremonie, fehlendes Gebet oder fehlende Geste, Modifikationen (Erzwingen, Kosten senken …) samt Kostenfolge
 - **Liturgienbuch** mit Katalog (185 Liturgien, 131 Zeremonien, 12 Segen), Filter nach Tradition und Gattung
-- **Entrückung** als Stufenzähler mit Tabelle: was jede Stufe auf Talent- und Zauberproben bewirkt
+- **Zustände** (Schmerz, Betäubung, Furcht, Verwirrung, Belastung, Paralyse, Berauscht, Entrückung) mit Stufen I–IV: Dialog aus der Heldenleiste, Abzeichen auf jedem Tab, automatische Erschwernis in Talent-, Kampf-, Zauber- und Liturgieproben (Deckel −5, handlungsunfähig ab 8 Stufen), Sperre bei Verwirrung III
+- **Schmerz aus den LeP** hergeleitet (¾, ½, ¼, ab 5 LeP) mit Vorteil „Zäher Hund"
+- **Entrückung** als Stufenzähler mit Tabelle, eingerechnet in Talent- und Zauberproben mit Chip „Gottgefällig"
 - **Laufende Effekte** zählen Zauber und Liturgien gemeinsam (−1 je Effekt auf alle Zauber- und Liturgieproben)
 - **Charakterverwaltung**
   - Eigenschaften (MU, KL, IN, CH, FF, GE, KO, KK)
@@ -21,6 +23,7 @@ Ein digitaler Würfelassistent und Charakterbogen.
   - Kampfwerte & Lebensenergie
   - Astralenergie & Zauberbuch (für zauberkundige Helden)
   - Karmaenergie & Liturgienbuch (für geweihte Helden), Tradition mit KaP-Richtwert
+  - Zustände und Vorteil Zäher Hund
 - **Würfelhistorie** mit LocalStorage-Persistenz
 - **Import/Export** von Charakterdaten (.held-Datei)
 - **Dark/Light Mode** mit automatischer Systemerkennung
