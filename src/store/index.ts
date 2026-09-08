@@ -10,6 +10,7 @@ import { combatRollReducer } from './combatRollSlice';
 import { simpleRollReducer } from './simpleRollSlice';
 import { loadState, saveState } from './persistence';
 import { karmaReducer } from './karmaSlice';
+import { conditionsReducer } from './conditionsSlice';
 import { spellbookReducer } from './spellbookSlice';
 import { liturgyRollReducer } from './liturgyRollSlice';
 import { spellRollReducer } from './spellRollSlice';
@@ -22,6 +23,7 @@ const rootReducer = combineReducers({
 	combat: combatReducer,
 	spellbook: spellbookReducer,
 	karma: karmaReducer,
+	conditions: conditionsReducer,
 	settings: settingsReducer,
 	// Laufende Wurf-Eingaben: bewusst nicht persistiert, aber im Store, damit sie
 	// den Unmount der Radix-Tab-Panels überleben.

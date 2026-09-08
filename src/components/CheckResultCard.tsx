@@ -16,6 +16,8 @@ type CheckResultCardProps = {
 	/** „Talentwert" oder „Fertigkeitswert" – die Rechnung ist dieselbe. */
 	tawLabel: string;
 	result: TalentCheckResult;
+	/** Zustandsposten, unter der Rechnung: „Schmerz II −2, Furcht I −1". */
+	note?: string;
 	/** Regelfolge in einem Satz. Überschreibt den Krit-Standardtext. */
 	consequence?: string;
 	action?: ReactNode;
@@ -41,6 +43,7 @@ const CheckResultCard = ({
 	taw,
 	tawLabel,
 	result,
+	note,
 	consequence,
 	action
 }: CheckResultCardProps) => (
@@ -100,6 +103,9 @@ const CheckResultCard = ({
 					</span>
 					<span className="tabular-nums">= {result.fp}</span>
 				</div>
+				{note && (
+					<p className="pt-1 text-xs text-muted-foreground">Zustände: {note}</p>
+				)}
 			</div>
 		}
 	/>

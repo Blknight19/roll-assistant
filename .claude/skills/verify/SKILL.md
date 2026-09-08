@@ -35,20 +35,24 @@ Math.random = () => (window.__rolls.length ? window.__rolls.shift() : orig());
 
 ### localStorage-Seed
 
-Persistenz-Key: `roll-app-state`. Aktuelles Format ist v5: `{ version: 5,
+Persistenz-Key: `roll-app-state`. Aktuelles Format ist v6: `{ version: 6,
 activeCharacterId, characters: [{ id, name, attributes, talents: [{id,value}],
-combat, spellbook, karma }], history, settings }`. `spellbook` je Charakter ist
-`{ isSpellcaster, asp: { current, max }, spells: [...], upkeep: [...] }`, `karma` ist
-`{ isBlessed, tradition, kap: { current, max }, liturgies: [...], blessings: [...],
-upkeep: [...], devotionLevel }`. `blessings` trägt Katalog-IDs der Segen — unbekannte
-IDs verwirft der Sanitizer, `devotionLevel` ist die Entrückungsstufe 0..4. `settings`
-trägt `confirmCriticals` und `noLiturgyFumble`.
-Ältere Blobs werden beim Laden migriert: v4 ohne `karma`, v2/v3 lagen flacher
+combat, spellbook, karma, conditions }], history, settings }`. `spellbook` je
+Charakter ist `{ isSpellcaster, asp: { current, max }, spells: [...], upkeep: [...] }`,
+`karma` ist `{ isBlessed, tradition, kap: { current, max }, liturgies: [...],
+blessings: [...], upkeep: [...] }` — ohne `devotionLevel`, das liegt seit v6 in
+`conditions`. `blessings` trägt Katalog-IDs der Segen — unbekannte IDs verwirft der
+Sanitizer. `conditions` ist `{ levels: { schmerz, betaeubung, furcht, verwirrung,
+belastung, paralyse, berauscht, entrueckung }, toughDog }`, jede Stufe 0..4; bei
+`schmerz` ist das nur die Zusatzstufe, der LeP-Anteil wird zur Laufzeit hergeleitet.
+`settings` trägt `confirmCriticals` und `noLiturgyFumble`.
+Ältere Blobs werden beim Laden migriert: v5 mit `karma.devotionLevel` wird nach
+`conditions.levels.entrueckung` übernommen, v4 ohne `karma`, v2/v3 lagen flacher
 (Charakter auf oberster Ebene bzw. `characters` ohne `spellbook`), Legacy v1 ist ein
-roher Slice-Dump ohne `version`. Zum Seeden reicht ein v5-Blob mit genau einem
+roher Slice-Dump ohne `version`. Zum Seeden reicht ein v6-Blob mit genau einem
 Eintrag in `characters`.
 **Achtung:** `addInitScript` läuft bei jedem Reload — nur seeden, wenn der Key `null`
-ist, sonst überschreibt der Seed den von der App geschriebenen v4-Blob und
+ist, sonst überschreibt der Seed den von der App geschriebenen Blob und
 Persistenz-Checks schlagen fälschlich fehl. Saves sind ~500 ms debounced: vor dem
 Auslesen `waitForTimeout(800)`.
 
@@ -78,6 +82,12 @@ Auslesen `waitForTimeout(800)`.
   `input[type=number]` nth(0) = Modifikator, nth(1) = Talentwert
 - **Strict-Mode-Falle:** Ergebnistexte stehen zusätzlich in einer `sr-only`
   aria-live-Region — `getByText(..., { exact: true })` verwenden.
+- Zustände: HeroBar-Knopf `getByRole('button', { name: /^Zustände/ })` öffnet den Dialog;
+  Stufen sind `role="group"` mit Namen „Stufe Betäubung" (bei Schmerz „Zusätzliche Stufe
+  Schmerz") und darin `button[aria-pressed]` mit Namen „Stufe II". Abzeichen in der
+  HeroBar stehen im Namen des Knopfs („Zustände bearbeiten: Betäubung II"). Chips an der
+  Probe: `getByRole('button', { name: 'Belastung gilt' })`, `… 'Gottgefällig'`.
+  Zäher Hund: `getByRole('switch', { name: 'Vorteil Zäher Hund' })`.
 
 ### Flows, die sich lohnen
 
@@ -85,7 +95,7 @@ Auslesen `waitForTimeout(800)`.
 2. TaW 20, Würfe klein → QS-Hero zeigt 6 (Cap), nicht 7
 3. Nach Wurf Modifikator ändern → Berechnung/QS unverändert (Snapshot)
 4. Kampf: d20=1 + Bestätigung ≤/> Zielwert → Krit vs. "Gelungen (Krit nicht bestätigt)"
-5. Legacy-Blob seeden → Talente/Attribute migriert, Blob wird als v5 zurückgeschrieben
+5. Legacy-Blob seeden → Talente/Attribute migriert, Blob wird als v6 zurückgeschrieben
 6. `navigator.serviceWorker.ready` abwarten → `context.setOffline(true)` → Reload rendert
 7. Liturgie mit „Ohne Gebet" → Gesamt −2 im Rechenweg
 8. Zeremonie: „Namenlose Tage" dann „Feiertag" → nur der Feiertag bleibt (Zeit ist
@@ -93,5 +103,15 @@ Auslesen `waitForTimeout(800)`.
 9. Würfel 1/1/x → Karte „Kritischer Erfolg", halbe KaP, Knopf „+1W6 auf die FP" hebt
    die FP und verschwindet danach
 10. Segen tippen → KaP −1, Historieneintrag „Segen: … (QS 1)" **ohne** Würfelzeile
-11. Entrückung: Stepper auf 2 → Tabellenzeile II hervorgehoben, HeroBar zeigt das
-    Abzeichen „E II" (`getByLabel('Entrückung Stufe 2')`); Stufe 0 blendet es aus
+11. Entrückung (Testcharakter braucht `karma.isBlessed === true`, sonst filtert der
+    Dialog die Zeile heraus): Stepper auf 2 → Tabellenzeile II hervorgehoben,
+    HeroBar-Knopf heißt „Zustände bearbeiten: Entrückung II"; Stufe 0 → Knopf heißt
+    „Zustände"
+12. Betäubung II + Furcht I → Talent-Tab „Gesamt −3 – Betäubung II −2, Furcht I −1",
+    Rechenweg `13 − 3 − Wurf`, Historie mit Posten
+13. Verwirrung III → Zaubern-Knopf grau mit „Verwirrung III: Zaubern ist unmöglich."
+14. LeP auf 15/30 → „Schmerz II durch LeP" unter der Leiste, Attacke „Zustände −2"
+15. Berauscht IV → Toast, Betäubung +1, Berauscht 0
+16. v5-Blob mit `devotionLevel: 2` seeden (Testcharakter braucht `karma.isBlessed ===
+    true`, sonst filtert der Dialog die Zeile heraus) → Entrückung II im Dialog, Blob
+    wird als v6 zurückgeschrieben

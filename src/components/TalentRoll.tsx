@@ -15,8 +15,13 @@ import {
 	setProbeModifier,
 	setProbeTaw,
 	setProbeLastRoll,
+	toggleProbeBelastung,
+	toggleProbeGottgefaellig,
 	type ProbeRoll
 } from '@/store/probeSlice';
+import ConditionChips, { type ConditionChip } from './ConditionChips';
+import { useConditions } from '@/hooks/useConditions';
+import { INCAPACITATED_WARNING, conditionNote, type ConditionTarget } from '@/utils/conditionRules';
 import {
 	Select,
 	SelectContent,
@@ -63,6 +68,36 @@ const TalentRoll = () => {
 		: undefined;
 	const tawDiffersFromSheet = sheetTalent !== undefined && sheetTalent.value !== probe.taw;
 
+	const conditions = useConditions();
+	const isBlessed = useSelector((state: RootState) => state.karma.isBlessed);
+	const target: ConditionTarget | undefined = sheetTalent
+		? { kind: 'talent', id: sheetTalent.id, group: sheetTalent.group, be: sheetTalent.be }
+		: undefined;
+	const conditionResult = target
+		? conditions.modifierFor(target, { belastungGilt: probe.belastungGilt, gottgefaellig: probe.gottgefaellig })
+		: undefined;
+	const auto = conditionResult?.modifier ?? 0;
+	const note = conditionResult ? conditionNote(conditionResult) : undefined;
+	const totalModifier = probe.modifier + auto;
+
+	const chips: ConditionChip[] = [];
+	if (sheetTalent?.be === 'evtl' && conditions.levels.belastung > 0) {
+		chips.push({
+			id: 'belastung',
+			label: 'Belastung gilt',
+			pressed: probe.belastungGilt,
+			onToggle: () => dispatch(toggleProbeBelastung())
+		});
+	}
+	if (isBlessed && conditions.levels.entrueckung > 0) {
+		chips.push({
+			id: 'gottgefaellig',
+			label: 'Gottgefällig',
+			pressed: probe.gottgefaellig,
+			onToggle: () => dispatch(toggleProbeGottgefaellig())
+		});
+	}
+
 	const selectTalent = (talentId: string) => {
 		const talent = talents.find(entry => entry.id === talentId);
 		if (!talent) return;
@@ -80,13 +115,14 @@ const TalentRoll = () => {
 	const rollProbe = () => {
 		const dice = roll3D20();
 		const attrs = probe.entries.map(entry => entry.value) as [number, number, number];
-		const result = evaluateTalentCheck(attrs, probe.taw, probe.modifier, dice);
+		const result = evaluateTalentCheck(attrs, probe.taw, totalModifier, dice);
 
 		const snapshot: ProbeRoll = {
 			talentName: probe.talentName,
 			entries: probe.entries.map(entry => ({ ...entry })),
-			modifier: probe.modifier,
+			modifier: totalModifier,
 			taw: probe.taw,
+			note,
 			result
 		};
 		dispatch(setProbeLastRoll(snapshot));
@@ -100,7 +136,7 @@ const TalentRoll = () => {
 			id: nanoid(),
 			type: 'Talent',
 			values: [...result.dice],
-			result: `${special}${probe.talentName}: ${result.fp} FP ${outcome} [Mod ${signedModifier(probe.modifier)}]`,
+			result: `${special}${probe.talentName}: ${result.fp} FP ${outcome} [Mod ${signedModifier(totalModifier)}${note ? `, ${note}` : ''}]`,
 			date: new Date().toISOString()
 		}));
 	};
@@ -214,6 +250,8 @@ const TalentRoll = () => {
 						</div>
 					)}
 
+					<ConditionChips chips={chips} />
+
 					<div className="flex flex-wrap items-end justify-between gap-3 border-t border-border pt-4">
 						<div className="flex flex-col items-center gap-1">
 							<PropertyNumber
@@ -250,18 +288,23 @@ const TalentRoll = () => {
 				taw={lastRoll.taw}
 				tawLabel="Talentwert"
 				result={lastRoll.result}
+				note={lastRoll.note}
 			/>
 		</div>
 	);
 
+	const blocked = conditionResult?.blockedReason;
 	const rollBar = (sticky: boolean) => (
 		<RollBar
 			sticky={sticky}
 			modifier={probe.modifier}
 			onModifierChange={(value) => dispatch(setProbeModifier(value))}
 			onRoll={rollProbe}
-			disabled={!probe.talentName}
-			disabledReason="Wähle ein Talent, um zu würfeln."
+			disabled={!probe.talentName || blocked !== undefined}
+			disabledReason={blocked ?? 'Wähle ein Talent, um zu würfeln.'}
+			autoModifier={auto}
+			autoNote={note}
+			warning={conditionResult?.incapacitated ? INCAPACITATED_WARNING : undefined}
 		/>
 	);
 

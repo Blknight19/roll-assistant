@@ -57,6 +57,9 @@ const CombatResultBar = ({ roll, label }: { roll: CombatRoll; label: string }) =
 				))}
 				<p className="text-xs text-muted-foreground">{derivationText(roll)}</p>
 			</div>
+			{roll.conditionNote && (
+				<p className="mt-1 text-xs text-muted-foreground">Zustände: {roll.conditionNote}</p>
+			)}
 
 			{consequence && <p className="mt-2 text-xs font-medium">{consequence}</p>}
 		</Card>

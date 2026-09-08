@@ -14,6 +14,8 @@ export type ProbeRoll = {
 	entries: ProbeEntry[];
 	modifier: number;
 	taw: number;
+	/** Zustandsposten des Wurfs, z. B. „Schmerz II −2". */
+	note?: string;
 	result: TalentCheckResult;
 };
 
@@ -23,6 +25,10 @@ export type ProbeState = {
 	entries: ProbeEntry[];
 	modifier: number;
 	taw: number;
+	/** Belastung bei Talenten mit BE „evtl." – hängt an Talent und Szene. */
+	belastungGilt: boolean;
+	/** Entrückung: die Probe ist dem eigenen Gott gefällig. */
+	gottgefaellig: boolean;
 	lastRoll: ProbeRoll | null;
 };
 
@@ -36,6 +42,8 @@ const initialState: ProbeState = {
 	],
 	modifier: 0,
 	taw: 10,
+	belastungGilt: false,
+	gottgefaellig: false,
 	lastRoll: null
 };
 
@@ -50,6 +58,8 @@ const probeSlice = createSlice({
 			state.taw = action.payload.taw;
 			// Sonst steht das Ergebnis des vorigen Talents über der neuen Auswahl.
 			state.lastRoll = null;
+			state.belastungGilt = false;
+			state.gottgefaellig = false;
 		},
 		setProbeEntry: (state, action: PayloadAction<{ index: number; attribute?: AttributeKey; value?: number }>) => {
 			const entry = state.entries[action.payload.index];
@@ -65,9 +75,23 @@ const probeSlice = createSlice({
 		},
 		setProbeLastRoll: (state, action: PayloadAction<ProbeRoll>) => {
 			state.lastRoll = action.payload;
+		},
+		toggleProbeBelastung: (state) => {
+			state.belastungGilt = !state.belastungGilt;
+		},
+		toggleProbeGottgefaellig: (state) => {
+			state.gottgefaellig = !state.gottgefaellig;
 		}
 	}
 });
 
-export const { selectProbeTalent, setProbeEntry, setProbeModifier, setProbeTaw, setProbeLastRoll } = probeSlice.actions;
+export const {
+	selectProbeTalent,
+	setProbeEntry,
+	setProbeModifier,
+	setProbeTaw,
+	setProbeLastRoll,
+	toggleProbeBelastung,
+	toggleProbeGottgefaellig
+} = probeSlice.actions;
 export const probeReducer = probeSlice.reducer;

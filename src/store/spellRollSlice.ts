@@ -12,6 +12,8 @@ export type SpellRoll = {
 	entries: SpellEntry[];
 	modifier: number;
 	taw: number;
+	/** Zustandsposten des Wurfs, z. B. „Schmerz II −2". */
+	note?: string;
 	/** Tatsächlich gebuchte AsP – der Rückgängig-Knopf bucht genau diese zurück. */
 	aspSpent: number;
 	/** Wirkungsdauer zum Zeitpunkt des Wurfs; nur „aufrechterhaltend" bindet Konzentration. */
@@ -31,13 +33,16 @@ export type SpellRollState = {
 	lastRoll: SpellRoll | null;
 	/** Ob die AsP des letzten Wurfs noch gebucht sind – schaltet den Rückgängig-Knopf. */
 	lastRollBooked: boolean;
+	/** Entrückung: die Probe ist dem eigenen Gott gefällig. */
+	gottgefaellig: boolean;
 };
 
 const initialState: SpellRollState = {
 	spellId: null,
 	modifier: 0,
 	lastRoll: null,
-	lastRollBooked: false
+	lastRollBooked: false,
+	gottgefaellig: false
 };
 
 const spellRollSlice = createSlice({
@@ -49,6 +54,7 @@ const spellRollSlice = createSlice({
 			// Sonst steht das Ergebnis des vorigen Zaubers über der neuen Auswahl.
 			state.lastRoll = null;
 			state.lastRollBooked = false;
+			state.gottgefaellig = false;
 		},
 		setSpellModifier: (state, action: PayloadAction<number>) => {
 			state.modifier = action.payload;
@@ -60,6 +66,9 @@ const spellRollSlice = createSlice({
 		/** Rückgängig: der Wurf bleibt sichtbar, die Buchung gilt als zurückgenommen. */
 		markLastRollRefunded: (state) => {
 			state.lastRollBooked = false;
+		},
+		toggleSpellGottgefaellig: (state) => {
+			state.gottgefaellig = !state.gottgefaellig;
 		}
 	}
 });
@@ -68,6 +77,7 @@ export const {
 	selectSpell,
 	setSpellModifier,
 	setSpellLastRoll,
-	markLastRollRefunded
+	markLastRollRefunded,
+	toggleSpellGottgefaellig
 } = spellRollSlice.actions;
 export const spellRollReducer = spellRollSlice.reducer;

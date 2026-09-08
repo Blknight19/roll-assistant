@@ -27,14 +27,17 @@ export const consequenceText = (roll: CombatRoll): string | undefined => {
 	return undefined;
 };
 
+const conditionTerm = (roll: CombatRoll): string =>
+	roll.conditionModifier === 0 ? '' : `${modifierTerm(roll.conditionModifier)} Zustände`;
+
 export const derivationText = (roll: CombatRoll): string => {
 	if (!roll.result) {
-		return `${roll.base} + ${roll.dice[0]}${modifierTerm(roll.modifier)} = ${roll.initiative}`;
+		return `${roll.base} + ${roll.dice[0]}${modifierTerm(roll.modifier)}${conditionTerm(roll)} = ${roll.initiative}`;
 	}
 	const { d20, target, confirmation } = roll.result;
-	const base = roll.modifier === 0
+	const base = roll.modifier === 0 && roll.conditionModifier === 0
 		? `Wurf: ${d20}, Zielwert: ${target}`
-		: `Wurf: ${d20}, Basis: ${roll.base}${modifierTerm(roll.modifier)} → ${target}`;
+		: `Wurf: ${d20}, Basis: ${roll.base}${modifierTerm(roll.modifier)}${conditionTerm(roll)} → ${target}`;
 	return confirmation ? `${base} | Bestätigung: ${confirmation.roll}` : base;
 };
 

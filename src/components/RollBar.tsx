@@ -32,6 +32,8 @@ type RollBarProps = {
 	 */
 	autoModifier?: number;
 	autoNote?: string;
+	/** Rote Zeile unter der Leiste, z. B. Handlungsunfähigkeit – warnt, sperrt nicht. */
+	warning?: string;
 	className?: string;
 };
 
@@ -45,6 +47,7 @@ const RollBar = ({
 	sticky = false,
 	autoModifier = 0,
 	autoNote,
+	warning,
 	className
 }: RollBarProps) => {
 	const total = modifier + autoModifier;
@@ -97,6 +100,12 @@ const RollBar = ({
 				<p className="mx-auto mt-2 max-w-3xl text-center text-xs text-muted-foreground">
 					Gesamt {signedModifier(total)}
 					{autoNote && <> – {autoNote}</>}
+				</p>
+			)}
+
+			{warning && (
+				<p className="mx-auto mt-2 max-w-3xl text-center text-xs font-semibold text-failure-dark dark:text-failure-light">
+					{warning}
 				</p>
 			)}
 		</div>

@@ -27,6 +27,8 @@ import {
 import type { RootState } from '@/store';
 import { useResultScroll } from '@/hooks/useResultScroll';
 import { useSustained } from '@/hooks/useSustained';
+import { useConditions } from '@/hooks/useConditions';
+import { INCAPACITATED_WARNING, conditionNote } from '@/utils/conditionRules';
 import { CIRCUMSTANCES, circumstanceModifier, costWithCircumstances } from '@/data/liturgies/circumstances';
 import { KAP_GRUNDWERT, LEITEIGENSCHAFTEN } from '@/data/liturgies/leiteigenschaften';
 import {
@@ -69,6 +71,9 @@ const LiturgyRoll = () => {
 	const noLiturgyFumble = useSelector((state: RootState) => state.settings.noLiturgyFumble);
 	const liturgyRoll = useSelector((state: RootState) => state.liturgyRoll);
 	const sustained = useSustained();
+	const conditions = useConditions();
+	const conditionResult = conditions.modifierFor({ kind: 'liturgie' });
+	const note = conditionNote(conditionResult);
 
 	const [pickerOpen, setPickerOpen] = useState(false);
 
@@ -90,11 +95,11 @@ const LiturgyRoll = () => {
 	const cost = costWithCircumstances(baseCost, active);
 
 	const lastRoll = liturgyRoll.lastRoll;
-	const auto = sustained.modifier + circumstanceModifier(active);
+	const auto = sustained.modifier + circumstanceModifier(active) + conditionResult.modifier;
 	const totalModifier = liturgyRoll.modifier + auto;
 	const canAfford = cost <= kap.current;
-	const ready = liturgy !== undefined && canAfford;
-	const autoNote = [sustained.note, circumstanceNote(active)].filter(Boolean).join('; ') || undefined;
+	const ready = liturgy !== undefined && canAfford && conditionResult.blockedReason === undefined;
+	const autoNote = [sustained.note, circumstanceNote(active), note].filter(Boolean).join('; ') || undefined;
 
 	const leiteigenschaft = LEITEIGENSCHAFTEN[tradition];
 	const richtwert = leiteigenschaft ? KAP_GRUNDWERT + attributes[leiteigenschaft] : undefined;
@@ -123,6 +128,7 @@ const LiturgyRoll = () => {
 			modifier: totalModifier,
 			circumstances: [...active],
 			taw: liturgy.value,
+			note,
 			kapSpent,
 			critBonus: null,
 			duration: liturgy.duration,
@@ -140,7 +146,7 @@ const LiturgyRoll = () => {
 			id: nanoid(),
 			type: 'Liturgie',
 			values: [...result.dice],
-			result: `${special}${liturgy.name}: ${result.fp} FP ${outcome} [Mod ${signedModifier(totalModifier)}, ${booking}]`,
+			result: `${special}${liturgy.name}: ${result.fp} FP ${outcome} [Mod ${signedModifier(totalModifier)}${note ? `, ${note}` : ''}, ${booking}]`,
 			date: new Date().toISOString()
 		}));
 	};
@@ -371,6 +377,7 @@ const LiturgyRoll = () => {
 				taw={lastRoll.taw}
 				tawLabel="Fertigkeitswert"
 				result={lastRoll.result}
+				note={lastRoll.note}
 				consequence={
 					liturgyRoll.lastRollBooked
 						? `${costNote(lastRoll)}${lastRoll.critBonus !== null ? ` · +${lastRoll.critBonus} FP durch den kritischen Erfolg` : ''}`
@@ -414,14 +421,15 @@ const LiturgyRoll = () => {
 			onModifierChange={(value) => dispatch(setLiturgyModifier(value))}
 			onRoll={cast}
 			disabled={!ready}
-			disabledReason={liturgy === undefined
+			disabledReason={conditionResult.blockedReason ?? (liturgy === undefined
 				? (liturgies.length === 0
 					? 'Trage im Charakterbogen unter „Liturgien" Einträge ein.'
 					: 'Wähle eine Liturgie, um zu wirken.')
-				: `Nicht genug KaP: ${cost} nötig, ${kap.current} vorhanden.`}
+				: `Nicht genug KaP: ${cost} nötig, ${kap.current} vorhanden.`)}
 			label="Wirken"
 			autoModifier={auto}
 			autoNote={autoNote}
+			warning={conditionResult.incapacitated ? INCAPACITATED_WARNING : undefined}
 		/>
 	);
 
