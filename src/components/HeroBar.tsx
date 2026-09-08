@@ -8,7 +8,6 @@ import ResourceBar from './ResourceBar';
 import ConditionsDialog from './ConditionsDialog';
 import ConditionBadges from './ConditionBadges';
 import { useConditions } from '@/hooks/useConditions';
-import { cn } from '@/lib/utils';
 
 /**
  * Name und Lebensenergie auf jedem Tab. Die LeP lag früher am Ende des Kampf-Tabs –
@@ -31,7 +30,7 @@ const HeroBar = () => {
 	const [editing, setEditing] = useState(false);
 
 	return (
-		<div className="mb-6 grid grid-cols-[minmax(0,1fr)_auto_auto] items-start gap-x-2 gap-y-2 rounded-lg border border-parchment-300 bg-card px-4 py-3 dark:border-parchment-700 sm:gap-x-3">
+		<div className="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2 gap-y-2 rounded-lg border border-parchment-300 bg-card px-4 py-3 dark:border-parchment-700 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:gap-x-3">
 			{editing ? (
 				<Input
 					autoFocus
@@ -44,13 +43,13 @@ const HeroBar = () => {
 					onKeyDown={(event) => {
 						if (event.key === 'Enter' || event.key === 'Escape') setEditing(false);
 					}}
-					className="h-9 max-w-[16rem] font-heading"
+					className="col-start-1 row-start-1 h-9 max-w-[16rem] font-heading"
 				/>
 			) : (
 				<button
 					type="button"
 					onClick={() => setEditing(true)}
-					className="group flex min-w-0 items-center gap-2 self-center rounded-md py-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+					className="group col-start-1 row-start-1 flex min-w-0 items-center gap-2 self-center rounded-md py-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
 					aria-label="Name des Helden bearbeiten"
 				>
 					<User className="h-4 w-4 shrink-0 text-parchment-600 dark:text-parchment-400" />
@@ -61,21 +60,18 @@ const HeroBar = () => {
 				</button>
 			)}
 
-			{/* Mobil stapeln die Leisten rechts und überspannen beide Zeilen, damit die
-			    Abzeichen direkt unter dem Namen beginnen statt unter den Leisten. Ab `sm`
-			    liegen die Leisten in einer Reihe und die Abzeichen bekommen eine eigene. */}
+			{/* Mobil bekommt der Name die erste Zeile allein, darunter stehen die Leisten
+			    nebeneinander als schmale Messer. Ab `sm` liegen Name, Leisten und Auslöser
+			    in einer Reihe, die Abzeichen darunter. */}
 			<div
-				className={cn(
-					'flex flex-col items-end gap-1 self-center sm:row-span-1 sm:flex-row sm:items-center sm:gap-x-4',
-					hasConditions && 'row-span-2'
-				)}
+				className="col-span-2 col-start-1 row-start-2 flex items-start gap-x-3 self-center sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:items-center sm:gap-x-4"
 			>
-				<ResourceBar label="LeP" current={life.current} max={life.max} tone="life" className="w-16 sm:w-36" />
+				<ResourceBar label="LeP" current={life.current} max={life.max} tone="life" compact className="sm:w-36" />
 				{isSpellcaster && (
-					<ResourceBar label="AsP" current={asp.current} max={asp.max} tone="astral" className="w-16 sm:w-36" />
+					<ResourceBar label="AsP" current={asp.current} max={asp.max} tone="astral" compact className="sm:w-36" />
 				)}
 				{isBlessed && (
-					<ResourceBar label="KaP" current={kap.current} max={kap.max} tone="karma" className="w-16 sm:w-36" />
+					<ResourceBar label="KaP" current={kap.current} max={kap.max} tone="karma" compact className="sm:w-36" />
 				)}
 			</div>
 
@@ -85,14 +81,14 @@ const HeroBar = () => {
 				<button
 					type="button"
 					aria-label={conditionLabel}
-					className="flex h-10 w-10 shrink-0 items-center justify-center self-center rounded-md hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+					className="col-start-2 row-start-1 flex h-10 w-10 shrink-0 items-center justify-center self-center rounded-md hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:col-start-3"
 				>
 					<Activity className="h-5 w-5 text-muted-foreground" />
 				</button>
 			</ConditionsDialog>
 
 			{hasConditions && (
-				<div className="col-start-1 flex min-w-0 flex-wrap items-center gap-1 sm:col-span-3">
+				<div className="col-span-2 col-start-1 row-start-3 flex min-w-0 flex-wrap items-center gap-1 sm:col-span-3 sm:row-start-2">
 					<ConditionBadges active={conditions.active} incapacitated={conditions.incapacitated} />
 				</div>
 			)}
