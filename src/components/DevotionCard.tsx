@@ -3,19 +3,22 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import PropertyNumber from './PropertyNumber';
 import type { RootState } from '@/store';
 import { setConditionLevel } from '@/store/conditionsSlice';
-import { DEVOTION_LEVELS, DEVOTION_MAX_LEVEL, DEVOTION_PER_LEVEL } from '@/data/liturgies/devotion';
+import {
+	CONDITION_MAX_LEVEL, DEVOTION_PER_LEVEL, DEVOTION_TABLE, ROMAN_LEVELS, conditionById
+} from '@/data/conditions';
 import { signedModifier } from '@/utils/format';
 import { Flame } from 'lucide-react';
 
+const ENTRUECKUNG = conditionById('entrueckung');
+
 /**
- * Entrückung entsteht nebenbei und wirkt woanders – auf Talente und Zauber, nicht auf
- * Liturgien. Die Karte hält die Stufe und erklärt sie; sie rechnet nichts in eine Probe
- * ein, weil die App nicht weiß, welche Probe der eigenen Gottheit gefällig ist.
+ * Entrückung entsteht beim Wirken und wirkt woanders – auf Talente und Zauber. Die Karte
+ * steht dort, wo sie entsteht; gestellt wird die Stufe hier oder im Zustände-Dialog.
  */
 const DevotionCard = () => {
 	const dispatch = useDispatch();
 	const level = useSelector((state: RootState) => state.conditions.levels.entrueckung);
-	const current = DEVOTION_LEVELS[level];
+	const current = ENTRUECKUNG.levels[level];
 
 	return (
 		<Card variant="parchment">
@@ -30,14 +33,14 @@ const DevotionCard = () => {
 					<PropertyNumber
 						label="Stufe"
 						value={level}
-						max={DEVOTION_MAX_LEVEL}
+						max={CONDITION_MAX_LEVEL}
 						size="s"
 						ariaLabel="Stufe der Entrückung"
 						onChange={(value) => dispatch(setConditionLevel({ id: 'entrueckung', level: value }))}
 					/>
 					<div className="text-center" aria-live="polite">
 						<p className="font-heading text-sm font-semibold uppercase tracking-wide text-karma-dark dark:text-karma-light">
-							{current.roman} – {current.name}
+							{ROMAN_LEVELS[level]} – {current.name}
 						</p>
 						<p className="mt-1 text-sm text-muted-foreground">{current.effect}</p>
 					</div>
@@ -53,30 +56,34 @@ const DevotionCard = () => {
 						</tr>
 					</thead>
 					<tbody>
-						{DEVOTION_LEVELS.slice(1).map((entry, index) => (
-							<tr
-								key={entry.roman}
-								className={index + 1 === level
-									? 'bg-karma/10 font-semibold text-karma-dark dark:text-karma-light'
-									: ''}
-							>
-								<th scope="row" className="p-2 text-left font-heading font-normal">
-									{entry.roman}{' '}
-									<span className="text-xs text-muted-foreground">{entry.name}</span>
-								</th>
-								<td className="p-2 text-center tabular-nums">
-									{entry.favoured === 0 ? '±0' : signedModifier(entry.favoured)}
-								</td>
-								<td className="p-2 text-center tabular-nums">{signedModifier(entry.other)}</td>
-							</tr>
-						))}
+						{DEVOTION_TABLE.slice(1).map((row, index) => {
+							const stufe = index + 1;
+							return (
+								<tr
+									key={stufe}
+									className={stufe === level
+										? 'bg-karma/10 font-semibold text-karma-dark dark:text-karma-light'
+										: ''}
+								>
+									<th scope="row" className="p-2 text-left font-heading font-normal">
+										{ROMAN_LEVELS[stufe]}{' '}
+										<span className="text-xs text-muted-foreground">{ENTRUECKUNG.levels[stufe].name}</span>
+									</th>
+									<td className="p-2 text-center tabular-nums">
+										{row.favoured === 0 ? '±0' : signedModifier(row.favoured)}
+									</td>
+									<td className="p-2 text-center tabular-nums">{signedModifier(row.other)}</td>
+								</tr>
+							);
+						})}
 					</tbody>
 				</table>
 
 				<p className="text-xs text-muted-foreground">
 					Je {DEVOTION_PER_LEVEL} KaP, die für Mirakel, Liturgien oder Zeremonien ausgegeben
-					werden, steigt die Stufe um 1. Ohne Karmaeinsatz sinkt sie stündlich um 1. Die
-					Modifikatoren gelten für Talente und Zauber, nicht für Liturgien.
+					werden, steigt die Stufe um 1. Ohne Karmaeinsatz sinkt sie stündlich um 1. Die App
+					rechnet die Stufe in Talent- und Zauberproben ein; ob eine Probe gottgefällig ist,
+					sagt der Chip an der Probe.
 				</p>
 			</CardContent>
 		</Card>

@@ -5,7 +5,10 @@ import type { RootState } from '@/store';
 import { CHARACTER_NAME_MAX, setCharacterName } from '@/store/profileSlice';
 import { Pencil, User } from 'lucide-react';
 import ResourceBar from './ResourceBar';
-import { DEVOTION_LEVELS } from '@/data/liturgies/devotion';
+import ConditionsDialog from './ConditionsDialog';
+import ConditionBadges from './ConditionBadges';
+import { useConditions } from '@/hooks/useConditions';
+import { cn } from '@/lib/utils';
 
 /**
  * Name und Lebensenergie auf jedem Tab. Die LeP lag früher am Ende des Kampf-Tabs –
@@ -19,7 +22,11 @@ const HeroBar = () => {
 	const isSpellcaster = useSelector((state: RootState) => state.spellbook.isSpellcaster);
 	const kap = useSelector((state: RootState) => state.karma.kap);
 	const isBlessed = useSelector((state: RootState) => state.karma.isBlessed);
-	const devotionLevel = useSelector((state: RootState) => state.conditions.levels.entrueckung);
+	const conditions = useConditions();
+	const conditionLabel = conditions.active.length === 0
+		? 'Zustände'
+		: `Zustände bearbeiten: ${conditions.active.map(entry => `${entry.name} ${entry.roman}`).join(', ')}`
+			+ (conditions.incapacitated ? ', handlungsunfähig' : '');
 	const [editing, setEditing] = useState(false);
 
 	return (
@@ -53,7 +60,7 @@ const HeroBar = () => {
 				</button>
 			)}
 
-			{/* `flex-wrap` ab `sm`: drei Leisten und das Entrückungsabzeichen passen auf
+			{/* `flex-wrap` ab `sm`: drei Leisten und der Zustände-Auslöser passen auf
 			    mittleren Breiten nicht mehr in eine Zeile neben den Heldennamen. */}
 			<div className="ml-auto flex flex-col items-end gap-1 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end sm:gap-x-4 sm:gap-y-1">
 				<ResourceBar label="LeP" current={life.current} max={life.max} tone="life" className="w-24 sm:w-36" />
@@ -63,16 +70,19 @@ const HeroBar = () => {
 				{isBlessed && (
 					<ResourceBar label="KaP" current={kap.current} max={kap.max} tone="karma" className="w-24 sm:w-36" />
 				)}
-				{/* Entrückung wirkt auf Talente und Zauber, also außerhalb des Liturgie-Tabs.
-				    Deshalb steht die Stufe hier, wo sie auf jedem Tab sichtbar ist. */}
-				{isBlessed && devotionLevel > 0 && (
-					<span
-						className="rounded-full border border-karma px-2 py-0.5 font-heading text-xs font-semibold text-karma-dark dark:text-karma-light"
-						aria-label={`Entrückung Stufe ${devotionLevel}`}
+				{/* Zustände wirken auf jedem Tab – der Auslöser steht deshalb neben den Ressourcen. */}
+				<ConditionsDialog>
+					<button
+						type="button"
+						aria-label={conditionLabel}
+						className={cn(
+							'flex flex-wrap items-center justify-end gap-1 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+							conditions.active.length === 0 ? 'h-10 w-10 justify-center hover:bg-accent' : 'min-h-9 px-1'
+						)}
 					>
-						E {DEVOTION_LEVELS[devotionLevel].roman}
-					</span>
-				)}
+						<ConditionBadges active={conditions.active} incapacitated={conditions.incapacitated} />
+					</button>
+				</ConditionsDialog>
 			</div>
 		</div>
 	);

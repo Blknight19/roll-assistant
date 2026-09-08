@@ -7,6 +7,7 @@ import {
 import type { RootState } from '@/store';
 import { setBlessed, setTradition } from '@/store/karmaSlice';
 import { setSpellcaster } from '@/store/spellbookSlice';
+import { setToughDog } from '@/store/conditionsSlice';
 import { TRADITIONEN } from '@/data/liturgies';
 import { User } from 'lucide-react';
 
@@ -22,6 +23,7 @@ const HeroSettings = () => {
 	const isSpellcaster = useSelector((state: RootState) => state.spellbook.isSpellcaster);
 	const isBlessed = useSelector((state: RootState) => state.karma.isBlessed);
 	const tradition = useSelector((state: RootState) => state.karma.tradition);
+	const toughDog = useSelector((state: RootState) => state.conditions.toughDog);
 
 	return (
 		<Card variant="parchment">
@@ -103,6 +105,24 @@ const HeroSettings = () => {
 						</Select>
 					</div>
 				)}
+
+				<div className="flex items-center justify-between gap-4">
+					<div className="text-left">
+						<label htmlFor="tough-dog" className="font-semibold">
+							Zäher Hund
+						</label>
+						<p className="text-sm text-muted-foreground">
+							Der Held ignoriert die höchste Stufe des Zustands Schmerz. Die App zieht sie bei
+							der Herleitung aus den LeP ab.
+						</p>
+					</div>
+					<Switch
+						id="tough-dog"
+						checked={toughDog}
+						onCheckedChange={(checked) => dispatch(setToughDog(checked))}
+						aria-label="Vorteil Zäher Hund"
+					/>
+				</div>
 			</CardContent>
 		</Card>
 	);
