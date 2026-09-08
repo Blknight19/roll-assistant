@@ -17,6 +17,8 @@ export type LiturgyRoll = {
 	modifier: number;
 	circumstances: string[];
 	taw: number;
+	/** Zustandsposten des Wurfs. */
+	note?: string;
 	/** Tatsächlich gebuchte KaP – der Rückgängig-Knopf bucht genau diese zurück. */
 	kapSpent: number;
 	/** 1W6 auf die FP beim kritischen Erfolg, einmal wählbar. */
