@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Input } from '@/components/ui/input';
 import type { RootState } from '@/store';
 import { CHARACTER_NAME_MAX, setCharacterName } from '@/store/profileSlice';
-import { Pencil, User } from 'lucide-react';
+import { Activity, Pencil, User } from 'lucide-react';
 import ResourceBar from './ResourceBar';
 import ConditionsDialog from './ConditionsDialog';
 import ConditionBadges from './ConditionBadges';
@@ -23,14 +23,15 @@ const HeroBar = () => {
 	const kap = useSelector((state: RootState) => state.karma.kap);
 	const isBlessed = useSelector((state: RootState) => state.karma.isBlessed);
 	const conditions = useConditions();
-	const conditionLabel = conditions.active.length === 0
-		? 'Zustände'
-		: `Zustände bearbeiten: ${conditions.active.map(entry => `${entry.name} ${entry.roman}`).join(', ')}`
-			+ (conditions.incapacitated ? ', handlungsunfähig' : '');
+	const hasConditions = conditions.active.length > 0;
+	const conditionLabel = hasConditions
+		? `Zustände bearbeiten: ${conditions.active.map(entry => `${entry.name} ${entry.roman}`).join(', ')}`
+			+ (conditions.incapacitated ? ', handlungsunfähig' : '')
+		: 'Zustände';
 	const [editing, setEditing] = useState(false);
 
 	return (
-		<div className="mb-6 flex flex-wrap items-center gap-3 rounded-lg border border-parchment-300 bg-card px-4 py-3 dark:border-parchment-700">
+		<div className="mb-6 grid grid-cols-[minmax(0,1fr)_auto_auto] items-start gap-x-2 gap-y-2 rounded-lg border border-parchment-300 bg-card px-4 py-3 dark:border-parchment-700 sm:gap-x-3">
 			{editing ? (
 				<Input
 					autoFocus
@@ -49,7 +50,7 @@ const HeroBar = () => {
 				<button
 					type="button"
 					onClick={() => setEditing(true)}
-					className="group flex min-w-0 items-center gap-2 rounded-md py-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+					className="group flex min-w-0 items-center gap-2 self-center rounded-md py-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
 					aria-label="Name des Helden bearbeiten"
 				>
 					<User className="h-4 w-4 shrink-0 text-parchment-600 dark:text-parchment-400" />
@@ -60,30 +61,41 @@ const HeroBar = () => {
 				</button>
 			)}
 
-			{/* `flex-wrap` ab `sm`: drei Leisten und der Zustände-Auslöser passen auf
-			    mittleren Breiten nicht mehr in eine Zeile neben den Heldennamen. */}
-			<div className="ml-auto flex flex-col items-end gap-1 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end sm:gap-x-4 sm:gap-y-1">
-				<ResourceBar label="LeP" current={life.current} max={life.max} tone="life" className="w-24 sm:w-36" />
+			{/* Mobil stapeln die Leisten rechts und überspannen beide Zeilen, damit die
+			    Abzeichen direkt unter dem Namen beginnen statt unter den Leisten. Ab `sm`
+			    liegen die Leisten in einer Reihe und die Abzeichen bekommen eine eigene. */}
+			<div
+				className={cn(
+					'flex flex-col items-end gap-1 self-center sm:row-span-1 sm:flex-row sm:items-center sm:gap-x-4',
+					hasConditions && 'row-span-2'
+				)}
+			>
+				<ResourceBar label="LeP" current={life.current} max={life.max} tone="life" className="w-16 sm:w-36" />
 				{isSpellcaster && (
-					<ResourceBar label="AsP" current={asp.current} max={asp.max} tone="astral" className="w-24 sm:w-36" />
+					<ResourceBar label="AsP" current={asp.current} max={asp.max} tone="astral" className="w-16 sm:w-36" />
 				)}
 				{isBlessed && (
-					<ResourceBar label="KaP" current={kap.current} max={kap.max} tone="karma" className="w-24 sm:w-36" />
+					<ResourceBar label="KaP" current={kap.current} max={kap.max} tone="karma" className="w-16 sm:w-36" />
 				)}
-				{/* Zustände wirken auf jedem Tab – der Auslöser steht deshalb neben den Ressourcen. */}
-				<ConditionsDialog>
-					<button
-						type="button"
-						aria-label={conditionLabel}
-						className={cn(
-							'flex flex-wrap items-center justify-end gap-1 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-							conditions.active.length === 0 ? 'h-10 w-10 justify-center hover:bg-accent' : 'min-h-9 px-1'
-						)}
-					>
-						<ConditionBadges active={conditions.active} incapacitated={conditions.incapacitated} />
-					</button>
-				</ConditionsDialog>
 			</div>
+
+			{/* Immer sichtbar, auch ohne aktiven Zustand: der Knopf ist der einzige Weg in
+			    den Dialog, die Abzeichen darunter sind reine Anzeige. */}
+			<ConditionsDialog>
+				<button
+					type="button"
+					aria-label={conditionLabel}
+					className="flex h-10 w-10 shrink-0 items-center justify-center self-center rounded-md hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+				>
+					<Activity className="h-5 w-5 text-muted-foreground" />
+				</button>
+			</ConditionsDialog>
+
+			{hasConditions && (
+				<div className="col-start-1 flex min-w-0 flex-wrap items-center gap-1 sm:col-span-3">
+					<ConditionBadges active={conditions.active} incapacitated={conditions.incapacitated} />
+				</div>
+			)}
 		</div>
 	);
 };
