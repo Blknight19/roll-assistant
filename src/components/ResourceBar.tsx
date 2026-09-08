@@ -7,7 +7,7 @@ type ResourceBarProps = {
 	/** LeP zeigen Schmerzstufen als Ampel; AsP und KaP haben kein Gegenstück. */
 	tone: 'life' | 'astral' | 'karma';
 	className?: string;
-	/** Mobil Beschriftung und Zahl in eine Zeile, den Balken darunter über die volle Breite. */
+	/** Unter `lg` Beschriftung und Zahl in eine Zeile, den Balken darunter über die volle Breite. */
 	compact?: boolean;
 };
 
@@ -24,14 +24,14 @@ const ResourceBar = ({ label, current, max, tone, className = '', compact = fals
 	return (
 		<div
 			className={`flex items-center gap-2 ${compact
-				? 'min-w-0 flex-1 flex-wrap justify-between gap-y-1 sm:flex-none sm:flex-nowrap sm:justify-start'
+				? 'min-w-0 flex-1 flex-wrap justify-between gap-y-1 lg:flex-none lg:flex-nowrap lg:justify-start'
 				: ''}`}
 		>
 			<span className="text-[0.65rem] font-semibold uppercase tracking-widest text-muted-foreground">
 				{label}
 			</span>
 			<div
-				className={`relative h-4 overflow-hidden rounded-full border border-parchment-400 bg-muted dark:border-parchment-600 ${compact ? 'order-last basis-full sm:order-none sm:basis-auto' : ''} ${className}`}
+				className={`relative h-4 overflow-hidden rounded-full border border-parchment-400 bg-muted dark:border-parchment-600 ${compact ? 'order-last basis-full lg:order-none lg:basis-auto' : ''} ${className}`}
 				role="img"
 				aria-label={`${label} ${current} von ${max}`}
 			>

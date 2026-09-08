@@ -30,7 +30,7 @@ const HeroBar = () => {
 	const [editing, setEditing] = useState(false);
 
 	return (
-		<div className="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2 gap-y-2 rounded-lg border border-parchment-300 bg-card px-4 py-3 dark:border-parchment-700 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:gap-x-3">
+		<div className="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2 gap-y-2 rounded-lg border border-parchment-300 bg-card px-4 py-3 dark:border-parchment-700 lg:grid-cols-[minmax(0,1fr)_auto_auto] lg:gap-x-3">
 			{editing ? (
 				<Input
 					autoFocus
@@ -60,18 +60,18 @@ const HeroBar = () => {
 				</button>
 			)}
 
-			{/* Mobil bekommt der Name die erste Zeile allein, darunter stehen die Leisten
-			    nebeneinander als schmale Messer. Ab `sm` liegen Name, Leisten und Auslöser
-			    in einer Reihe, die Abzeichen darunter. */}
+			{/* Bis `lg` bekommt der Name die erste Zeile allein und die Leisten stehen als
+			    Messer nebeneinander darunter. Die einreihige Fassung braucht rund 1000 px –
+			    darunter bliebe für den Namen nichts übrig. `flex-wrap` fängt den Rest ab. */}
 			<div
-				className="col-span-2 col-start-1 row-start-2 flex items-start gap-x-3 self-center sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:items-center sm:gap-x-4"
+				className="col-span-2 col-start-1 row-start-2 flex min-w-0 flex-wrap items-start gap-x-3 gap-y-1 self-center lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:items-center lg:gap-x-3"
 			>
-				<ResourceBar label="LeP" current={life.current} max={life.max} tone="life" compact className="sm:w-36" />
+				<ResourceBar label="LeP" current={life.current} max={life.max} tone="life" compact className="lg:w-36" />
 				{isSpellcaster && (
-					<ResourceBar label="AsP" current={asp.current} max={asp.max} tone="astral" compact className="sm:w-36" />
+					<ResourceBar label="AsP" current={asp.current} max={asp.max} tone="astral" compact className="lg:w-36" />
 				)}
 				{isBlessed && (
-					<ResourceBar label="KaP" current={kap.current} max={kap.max} tone="karma" compact className="sm:w-36" />
+					<ResourceBar label="KaP" current={kap.current} max={kap.max} tone="karma" compact className="lg:w-36" />
 				)}
 			</div>
 
@@ -81,14 +81,14 @@ const HeroBar = () => {
 				<button
 					type="button"
 					aria-label={conditionLabel}
-					className="col-start-2 row-start-1 flex h-10 w-10 shrink-0 items-center justify-center self-center rounded-md hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:col-start-3"
+					className="col-start-2 row-start-1 flex h-10 w-10 shrink-0 items-center justify-center self-center rounded-md hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:col-start-3"
 				>
 					<Activity className="h-5 w-5 text-muted-foreground" />
 				</button>
 			</ConditionsDialog>
 
 			{hasConditions && (
-				<div className="col-span-2 col-start-1 row-start-3 flex min-w-0 flex-wrap items-center gap-1 sm:col-span-3 sm:row-start-2">
+				<div className="col-span-2 col-start-1 row-start-3 flex min-w-0 flex-wrap items-center gap-1 lg:col-span-3 lg:row-start-2">
 					<ConditionBadges active={conditions.active} incapacitated={conditions.incapacitated} />
 				</div>
 			)}
