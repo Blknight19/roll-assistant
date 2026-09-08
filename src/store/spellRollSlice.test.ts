@@ -5,6 +5,7 @@ import {
 	setSpellLastRoll,
 	setSpellModifier,
 	spellRollReducer,
+	toggleSpellGottgefaellig,
 	type SpellRoll
 } from './spellRollSlice';
 import type { TalentCheckResult } from '@/utils/rules';
@@ -37,7 +38,7 @@ describe('spellRollReducer', () => {
 		// Fertigkeitswert, Kosten und Wirkungsdauer liest die Ansicht live aus dem
 		// Zauberbuch – hier abgelegt würden sie beim nächsten Änderung veralten.
 		expect(Object.keys(state).sort()).toEqual(
-			['lastRoll', 'lastRollBooked', 'modifier', 'spellId'].sort()
+			['gottgefaellig', 'lastRoll', 'lastRollBooked', 'modifier', 'spellId'].sort()
 		);
 	});
 
@@ -65,5 +66,12 @@ describe('spellRollReducer', () => {
 		let state = spellRollReducer(undefined, setSpellModifier(-2));
 		state = spellRollReducer(state, selectSpell('z1'));
 		expect(state.modifier).toBe(-2);
+	});
+
+	it('setzt den Chip „gottgefällig" beim Wechsel des Zaubers zurück', () => {
+		let state = spellRollReducer(undefined, toggleSpellGottgefaellig());
+		expect(state.gottgefaellig).toBe(true);
+		state = spellRollReducer(state, selectSpell('z2'));
+		expect(state.gottgefaellig).toBe(false);
 	});
 });

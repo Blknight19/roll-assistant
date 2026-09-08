@@ -9,6 +9,9 @@ import CheckResultCard, { checkSummary } from './CheckResultCard';
 import PropertyNumber from './PropertyNumber';
 import ResourceBar from './ResourceBar';
 import SustainedEffects from './SustainedEffects';
+import ConditionChips, { type ConditionChip } from './ConditionChips';
+import { useConditions } from '@/hooks/useConditions';
+import { INCAPACITATED_WARNING, conditionNote } from '@/utils/conditionRules';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -22,6 +25,7 @@ import {
 	selectSpell,
 	setSpellLastRoll,
 	setSpellModifier,
+	toggleSpellGottgefaellig,
 	type SpellRoll as SpellRollSnapshot
 } from '@/store/spellRollSlice';
 import type { RootState } from '@/store';
@@ -54,6 +58,10 @@ const SpellRoll = () => {
 	const { spells, asp, upkeep } = useSelector((state: RootState) => state.spellbook);
 	const spellRoll = useSelector((state: RootState) => state.spellRoll);
 	const sustained = useSustained();
+	const conditions = useConditions();
+	const isBlessed = useSelector((state: RootState) => state.karma.isBlessed);
+	const conditionResult = conditions.modifierFor({ kind: 'zauber' }, { gottgefaellig: spellRoll.gottgefaellig });
+	const note = conditionNote(conditionResult);
 
 	const [pickerOpen, setPickerOpen] = useState(false);
 
@@ -72,10 +80,19 @@ const SpellRoll = () => {
 	const cost = spell?.cost ?? 0;
 
 	const lastRoll = spellRoll.lastRoll;
-	const auto = sustained.modifier;
+	const auto = sustained.modifier + conditionResult.modifier;
+	const autoNote = [sustained.note, note].filter(Boolean).join('; ') || undefined;
 	const totalModifier = spellRoll.modifier + auto;
 	const canAfford = cost <= asp.current;
-	const ready = spell !== undefined && canAfford;
+	const ready = spell !== undefined && canAfford && conditionResult.blockedReason === undefined;
+	const chips: ConditionChip[] = isBlessed && conditions.levels.entrueckung > 0
+		? [{
+			id: 'gottgefaellig',
+			label: 'Gottgefällig',
+			pressed: spellRoll.gottgefaellig,
+			onToggle: () => dispatch(toggleSpellGottgefaellig())
+		}]
+		: [];
 
 	const resultRef = useResultScroll(lastRoll);
 
@@ -97,6 +114,7 @@ const SpellRoll = () => {
 			entries: entries.map(entry => ({ ...entry })),
 			modifier: totalModifier,
 			taw: spell.value,
+			note,
 			aspSpent,
 			duration: spell.duration,
 			result
@@ -117,7 +135,7 @@ const SpellRoll = () => {
 			id: nanoid(),
 			type: 'Zauber',
 			values: [...result.dice],
-			result: `${special}${spell.name}: ${result.fp} FP ${outcome} [Mod ${signedModifier(totalModifier)}, ${aspBooking}]`,
+			result: `${special}${spell.name}: ${result.fp} FP ${outcome} [Mod ${signedModifier(totalModifier)}${note ? `, ${note}` : ''}, ${aspBooking}]`,
 			date: new Date().toISOString()
 		}));
 	};
@@ -207,6 +225,8 @@ const SpellRoll = () => {
 									FW <span className="font-bold">{spell.value}</span>
 								</span>
 							</div>
+
+							<ConditionChips chips={chips} />
 
 							{/* Die Sanduhr trennt die Zauberdauer sichtbar vom Timer, der für die
 							    Wirkungsdauer laufender Zauber steht. */}
@@ -316,6 +336,7 @@ const SpellRoll = () => {
 				taw={lastRoll.taw}
 				tawLabel="Fertigkeitswert"
 				result={lastRoll.result}
+				note={lastRoll.note}
 				// Die AsP-Buchung verdrängt den Krit-Standardtext: am Tisch ist die
 				// Frage „was hat es gekostet", nicht „warum ist es gelungen".
 				consequence={
@@ -353,14 +374,15 @@ const SpellRoll = () => {
 			onModifierChange={(value) => dispatch(setSpellModifier(value))}
 			onRoll={cast}
 			disabled={!ready}
-			disabledReason={spell === undefined
+			disabledReason={conditionResult.blockedReason ?? (spell === undefined
 				? (spells.length === 0
 					? 'Trage im Charakterbogen unter „Zauberbuch" Zauber ein.'
 					: 'Wähle einen Zauber, um zu wirken.')
-				: `Nicht genug AsP: ${cost} nötig, ${asp.current} vorhanden.`}
+				: `Nicht genug AsP: ${cost} nötig, ${asp.current} vorhanden.`)}
 			label="Zaubern"
 			autoModifier={auto}
-			autoNote={sustained.note}
+			autoNote={autoNote}
+			warning={conditionResult.incapacitated ? INCAPACITATED_WARNING : undefined}
 		/>
 	);
 
