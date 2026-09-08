@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import PropertyNumber from './PropertyNumber';
 import type { RootState } from '@/store';
-import { setDevotionLevel } from '@/store/karmaSlice';
+import { setConditionLevel } from '@/store/conditionsSlice';
 import { DEVOTION_LEVELS, DEVOTION_MAX_LEVEL, DEVOTION_PER_LEVEL } from '@/data/liturgies/devotion';
 import { signedModifier } from '@/utils/format';
 import { Flame } from 'lucide-react';
@@ -14,7 +14,7 @@ import { Flame } from 'lucide-react';
  */
 const DevotionCard = () => {
 	const dispatch = useDispatch();
-	const level = useSelector((state: RootState) => state.karma.devotionLevel);
+	const level = useSelector((state: RootState) => state.conditions.levels.entrueckung);
 	const current = DEVOTION_LEVELS[level];
 
 	return (
@@ -33,7 +33,7 @@ const DevotionCard = () => {
 						max={DEVOTION_MAX_LEVEL}
 						size="s"
 						ariaLabel="Stufe der Entrückung"
-						onChange={(value) => dispatch(setDevotionLevel(value))}
+						onChange={(value) => dispatch(setConditionLevel({ id: 'entrueckung', level: value }))}
 					/>
 					<div className="text-center" aria-live="polite">
 						<p className="font-heading text-sm font-semibold uppercase tracking-wide text-karma-dark dark:text-karma-light">

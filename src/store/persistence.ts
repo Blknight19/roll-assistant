@@ -46,16 +46,17 @@ import {
 	type Liturgy
 } from './karmaSlice';
 import { clampTalentValue, initialTalentState, type Talent, type TalentState } from './talentsSlice';
+import { initialConditionsState, type ConditionsState } from './conditionsSlice';
 import { SPELL_CATALOG } from '@/data/spells';
 import { LITURGY_CATALOG } from '@/data/liturgies';
-import { clampDevotionLevel } from '@/data/liturgies/devotion';
+import { CONDITION_IDS, clampConditionLevel, emptyConditionLevels } from '@/data/conditions';
 import { stripControlChars } from '@/utils/text';
 
 const STORAGE_KEY = 'roll-app-state';
 /** Schlüssel vor der Umbenennung – wird beim ersten Laden einmalig übernommen. */
 const LEGACY_STORAGE_KEY = 'dsa-app-state';
 
-export const PERSISTED_VERSION = 5;
+export const PERSISTED_VERSION = 6;
 
 /**
  * Ein Charakter im Dateiformat. Die App verwaltet heute genau einen, das Format trägt
@@ -69,6 +70,7 @@ export type PersistedCharacter = {
 	combat: CombatState;
 	spellbook: SpellbookState;
 	karma: KarmaState;
+	conditions: ConditionsState;
 };
 
 /** Format des localStorage-Blobs ab Version 3. */
@@ -89,6 +91,7 @@ export type PersistedSlices = {
 	combat: CombatState;
 	spellbook: SpellbookState;
 	karma: KarmaState;
+	conditions: ConditionsState;
 	roll: { history: RollHistoryEntry[] };
 	settings: SettingsState;
 };
@@ -339,9 +342,27 @@ export const sanitizeKarma = (raw: unknown): KarmaState => {
 		kap,
 		liturgies,
 		blessings,
-		upkeep,
-		devotionLevel: isFiniteNumber(raw.devotionLevel) ? clampDevotionLevel(raw.devotionLevel) : 0
+		upkeep
 	};
+};
+
+/**
+ * Stufen feldweise aus den bekannten IDs, fremde Schlüssel verworfen. `legacyDevotion`
+ * ist die Entrückungsstufe eines Blobs vor v6 – nur dann, wenn `conditions` fehlt.
+ */
+export const sanitizeConditions = (raw: unknown, legacyDevotion?: unknown): ConditionsState => {
+	const levels = emptyConditionLevels();
+	if (isRecord(raw)) {
+		if (isRecord(raw.levels)) {
+			for (const id of CONDITION_IDS) {
+				const value = raw.levels[id];
+				if (isFiniteNumber(value)) levels[id] = clampConditionLevel(value);
+			}
+		}
+		return { levels, toughDog: raw.toughDog === true };
+	}
+	if (isFiniteNumber(legacyDevotion)) levels.entrueckung = clampConditionLevel(legacyDevotion);
+	return { levels, toughDog: initialConditionsState.toughDog };
 };
 
 export const sanitizeProfile = (raw: unknown): ProfileState => {
@@ -366,6 +387,7 @@ const activeCharacter = (raw: Record<string, unknown>): unknown => {
 
 /**
  * Normalisiert einen persistierten Blob beliebiger Version in den Store-Shape.
+ * - v6: Zustände je Charakter, Entrückung aus dem Karma-Slice übernommen
  * - v3: Charakterliste mit aktivem Eintrag
  * - v2: flacher Charakter auf oberster Ebene
  * - ohne version: Alt-Format (kompletter Slice-Dump)
@@ -385,6 +407,9 @@ export const migratePersisted = (raw: unknown): PersistedSlices | undefined => {
 		: source.talents;
 	const history = legacy ? (isRecord(raw.roll) ? raw.roll.history : undefined) : raw.history;
 
+	// Bis v5 lag die Entrückungsstufe im Karma-Slice; ab v6 gehört sie zu den Zuständen.
+	const legacyDevotion = version <= 5 && isRecord(source.karma) ? source.karma.devotionLevel : undefined;
+
 	return {
 		profile: version >= 3
 			? sanitizeProfile(source)
@@ -394,6 +419,7 @@ export const migratePersisted = (raw: unknown): PersistedSlices | undefined => {
 		combat: sanitizeCombat(source.combat),
 		spellbook: fillCastTimes(sanitizeSpellbook(source.spellbook)),
 		karma: sanitizeKarma(source.karma),
+		conditions: sanitizeConditions(source.conditions, legacyDevotion),
 		roll: { history: sanitizeHistory(history) },
 		settings: sanitizeSettings(legacy ? undefined : raw.settings)
 	};
@@ -424,7 +450,8 @@ export const toPersisted = (state: PersistedSlices): PersistedState => ({
 		talents: state.talents.talents.map(({ id, value }) => ({ id, value })),
 		combat: state.combat,
 		spellbook: state.spellbook,
-		karma: state.karma
+		karma: state.karma,
+		conditions: state.conditions
 	}],
 	history: state.roll.history.slice(0, HISTORY_LIMIT),
 	settings: state.settings

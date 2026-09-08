@@ -3,11 +3,13 @@ import {
 	HISTORY_RESULT_MAX,
 	PERSISTED_VERSION,
 	migratePersisted,
+	sanitizeConditions,
 	sanitizeHistory,
 	sanitizeKarma,
 	sanitizeSpellbook,
 	toPersisted
 } from './persistence';
+import { initialConditionsState } from './conditionsSlice';
 import { initialKarmaState } from './karmaSlice';
 import { initialTalentState } from './talentsSlice';
 import { initialSettingsState } from './settingsSlice';
@@ -549,13 +551,6 @@ describe('sanitizeKarma', () => {
 		expect(karma.upkeep.map(u => u.id)).toEqual(['u1']);
 	});
 
-	it('rettet die Entrückungsstufe und clampt sie', () => {
-		expect(sanitizeKarma({ devotionLevel: 3 }).devotionLevel).toBe(3);
-		expect(sanitizeKarma({ devotionLevel: 99 }).devotionLevel).toBe(4);
-		expect(sanitizeKarma({ devotionLevel: 'viel' }).devotionLevel).toBe(0);
-		expect(sanitizeKarma({}).devotionLevel).toBe(0);
-	});
-
 	it('lässt ein Liturgienbuch mit Inhalt isBlessed false unverändert überleben', () => {
 		const karma = sanitizeKarma({
 			isBlessed: false,
@@ -613,5 +608,51 @@ describe('Sanitizer bauen Objekte feldweise auf', () => {
 			}]
 		});
 		expect(Object.keys(karma.liturgies[0])).not.toContain('boesartig');
+	});
+});
+
+describe('sanitizeConditions', () => {
+	it('liefert den Initialzustand, wenn das Feld fehlt', () => {
+		expect(sanitizeConditions(undefined)).toEqual(initialConditionsState);
+		expect(sanitizeConditions('x')).toEqual(initialConditionsState);
+	});
+
+	it('klammert jede Stufe und verwirft fremde Schlüssel', () => {
+		const state = sanitizeConditions({ levels: { schmerz: 99, furcht: -3, fremd: 2, betaeubung: 'zwei' }, toughDog: true });
+		expect(state.levels.schmerz).toBe(4);
+		expect(state.levels.furcht).toBe(0);
+		expect(state.levels.betaeubung).toBe(0);
+		expect(Object.keys(state.levels)).not.toContain('fremd');
+		expect(state.toughDog).toBe(true);
+	});
+
+	it('nimmt Zäher Hund nur als Boolean', () => {
+		expect(sanitizeConditions({ toughDog: 'ja' }).toughDog).toBe(false);
+	});
+
+	it('übernimmt die Entrückungsstufe eines v5-Blobs in den neuen Slice', () => {
+		const state = migratePersisted({
+			version: 5,
+			activeCharacterId: 'held-1',
+			characters: [{ id: 'held-1', name: 'A', karma: { devotionLevel: 2 } }]
+		})!;
+		expect(state.conditions.levels.entrueckung).toBe(2);
+		expect('devotionLevel' in state.karma).toBe(false);
+	});
+
+	it('ignoriert ein verirrtes devotionLevel in einem v6-Blob', () => {
+		const state = migratePersisted({
+			version: 6,
+			activeCharacterId: 'held-1',
+			characters: [{ id: 'held-1', name: 'A', karma: { devotionLevel: 2 } }]
+		})!;
+		expect(state.conditions.levels.entrueckung).toBe(0);
+	});
+
+	it('überlebt den Roundtrip mit Stufen und Zäher Hund', () => {
+		const slices = migratePersisted({ version: 2 })!;
+		slices.conditions = { levels: { ...initialConditionsState.levels, paralyse: 2 }, toughDog: true };
+		const reloaded = migratePersisted(JSON.parse(JSON.stringify(toPersisted(slices))))!;
+		expect(reloaded.conditions).toEqual(slices.conditions);
 	});
 });

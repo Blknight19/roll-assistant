@@ -12,7 +12,6 @@ import {
 	type UpkeepEntry
 } from './spellbookSlice';
 import { clampTalentValue } from './talentsSlice';
-import { clampDevotionLevel } from '@/data/liturgies/devotion';
 import { stripControlChars } from '@/utils/text';
 
 /** Segen stehen nicht im Buch – sie sind eine geschlossene Liste und nur als Katalog-ID erworben. */
@@ -49,8 +48,6 @@ export type KarmaState = {
 	blessings: string[];
 	/** Laufende Liturgien – zählen zusammen mit den laufenden Zaubern in den Malus. */
 	upkeep: UpkeepEntry[];
-	/** Stufe des Zustands Entrückung, 0..4. Vom Spieler gestellt, nicht hergeleitet. */
-	devotionLevel: number;
 };
 
 export const KAP_MAX = 999;
@@ -65,8 +62,7 @@ export const initialKarmaState: KarmaState = {
 	kap: { current: 0, max: 0 },
 	liturgies: [],
 	blessings: [],
-	upkeep: [],
-	devotionLevel: 0
+	upkeep: []
 };
 
 /**
@@ -144,9 +140,6 @@ const karmaSlice = createSlice({
 		removeKarmaUpkeep: (state, action: PayloadAction<string>) => {
 			state.upkeep = state.upkeep.filter(entry => entry.id !== action.payload);
 		},
-		setDevotionLevel: (state, action: PayloadAction<number>) => {
-			state.devotionLevel = clampDevotionLevel(action.payload);
-		},
 		/**
 		 * Ersetzt das Buch am Stück – für den Import. Teilt bewusst nicht die
 		 * Ersteinrichtungs-Auffüllung aus `setKap`: eine importierte KaP von 0/30 ist ein
@@ -159,7 +152,6 @@ const karmaSlice = createSlice({
 			state.liturgies = action.payload.liturgies.slice(0, LITURGY_LIMIT).map(normalizeLiturgy);
 			state.blessings = [...new Set(action.payload.blessings)];
 			state.upkeep = action.payload.upkeep;
-			state.devotionLevel = clampDevotionLevel(action.payload.devotionLevel);
 		}
 	}
 });
@@ -175,7 +167,6 @@ export const {
 	toggleBlessing,
 	addKarmaUpkeep,
 	removeKarmaUpkeep,
-	setDevotionLevel,
 	setKarma
 } = karmaSlice.actions;
 export const karmaReducer = karmaSlice.reducer;

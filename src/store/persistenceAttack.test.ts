@@ -23,7 +23,8 @@ const BOES = {
       blessings: ['speisesegen', 'gibtsnicht', 42, null, 'speisesegen'],
       upkeep: Array.from({ length: 300 }, (_, i) => ({ id: 'u' + i, spellName: 'S', qs: 3 })),
       devotionLevel: 999
-    }
+    },
+    conditions: { levels: { schmerz: 1e9, verwirrung: NaN, fremd: 3 }, toughDog: 'ja', boesartig: 'x' },
   }],
   history: Array.from({ length: 500 }, (_, i) => ({
     id: 'h' + i, type: 'Liturgie', values: [1, 2, 3], result: 'r'.repeat(1000), date: '2026-01-01'
@@ -42,7 +43,10 @@ describe('Präparierte Charakterdatei', () => {
     expect(s.attributes.IN).toBe(8);
     expect(k.kap.max).toBeLessThanOrEqual(999);
     expect(Number.isFinite(k.kap.current)).toBe(true);
-    expect(k.devotionLevel).toBe(4);
+    expect(s.conditions.levels.entrueckung).toBe(0);
+    expect(s.conditions.levels.schmerz).toBe(4);
+    expect(s.conditions.levels.verwirrung).toBe(0);
+    expect(Object.keys(s.conditions.levels)).not.toContain('fremd');
   });
   it('deckelt Listen', () => {
     expect(k.liturgies.length).toBeLessThanOrEqual(100);
@@ -60,6 +64,7 @@ describe('Präparierte Charakterdatei', () => {
     expect(s.spellbook.isSpellcaster).toBe(false);
     expect(s.settings.confirmCriticals).toBe(true);
     expect(s.settings.noLiturgyFumble).toBe(false);
+    expect(s.conditions.toughDog).toBe(false);
   });
   it('verwirft unbekannte Segen und Dubletten', () => {
     expect(k.blessings).toEqual(['speisesegen']);

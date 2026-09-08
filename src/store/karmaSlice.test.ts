@@ -11,7 +11,6 @@ import {
 	removeKarmaUpkeep,
 	removeLiturgy,
 	setBlessed,
-	setDevotionLevel,
 	setKap,
 	setKarma,
 	setTradition,
@@ -126,30 +125,11 @@ describe('karmaReducer', () => {
 				tradition: 'Praios',
 				kap: { current: 0, max: 30 },
 				liturgies: [liturgie()],
-				blessings: ['speisesegen'],
-				devotionLevel: 2
+				blessings: ['speisesegen']
 			})
 		);
 		expect(state.kap).toEqual({ current: 0, max: 30 });
 		expect(state.tradition).toBe('Praios');
 		expect(state.liturgies).toHaveLength(1);
-		expect(state.devotionLevel).toBe(2);
-	});
-});
-
-describe('Entrückung', () => {
-	it('stellt die Stufe und hält sie zwischen 0 und IV', () => {
-		let state = karmaReducer(initialKarmaState, setDevotionLevel(3));
-		expect(state.devotionLevel).toBe(3);
-		state = karmaReducer(state, setDevotionLevel(9));
-		expect(state.devotionLevel).toBe(4);
-		state = karmaReducer(state, setDevotionLevel(-1));
-		expect(state.devotionLevel).toBe(0);
-	});
-
-	it('bleibt vom Geweiht-Schalter unberührt', () => {
-		let state = karmaReducer(initialKarmaState, setDevotionLevel(2));
-		state = karmaReducer(state, setBlessed(false));
-		expect(state.devotionLevel).toBe(2);
 	});
 });

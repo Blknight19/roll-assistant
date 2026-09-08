@@ -12,6 +12,7 @@ import { setCharacterName } from '@/store/profileSlice';
 import { setHistory } from '@/store/rollSlice';
 import { setConfirmCriticals, setNoLiturgyFumble } from '@/store/settingsSlice';
 import { setKarma } from '@/store/karmaSlice';
+import { setConditions } from '@/store/conditionsSlice';
 import { setSpellbook } from '@/store/spellbookSlice';
 import { updateTalent } from '@/store/talentsSlice';
 
@@ -69,6 +70,7 @@ export const importCharacter = async (file: File): Promise<boolean> => {
 	dispatch(updateLifeStat(imported.combat.life));
 	dispatch(setSpellbook(imported.spellbook));
 	dispatch(setKarma(imported.karma));
+	dispatch(setConditions(imported.conditions));
 	dispatch(setHistory(imported.roll.history));
 	dispatch(setConfirmCriticals(imported.settings.confirmCriticals));
 	dispatch(setNoLiturgyFumble(imported.settings.noLiturgyFumble));

@@ -19,7 +19,7 @@ const HeroBar = () => {
 	const isSpellcaster = useSelector((state: RootState) => state.spellbook.isSpellcaster);
 	const kap = useSelector((state: RootState) => state.karma.kap);
 	const isBlessed = useSelector((state: RootState) => state.karma.isBlessed);
-	const devotionLevel = useSelector((state: RootState) => state.karma.devotionLevel);
+	const devotionLevel = useSelector((state: RootState) => state.conditions.levels.entrueckung);
 	const [editing, setEditing] = useState(false);
 
 	return (
