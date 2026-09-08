@@ -103,12 +103,15 @@ Auslesen `waitForTimeout(800)`.
 9. Würfel 1/1/x → Karte „Kritischer Erfolg", halbe KaP, Knopf „+1W6 auf die FP" hebt
    die FP und verschwindet danach
 10. Segen tippen → KaP −1, Historieneintrag „Segen: … (QS 1)" **ohne** Würfelzeile
-11. Entrückung: Stepper auf 2 → Tabellenzeile II hervorgehoben, HeroBar-Knopf heißt
-    „Zustände bearbeiten: Entrückung II"; Stufe 0 → Knopf heißt „Zustände"
+11. Entrückung (Testcharakter braucht `karma.isBlessed === true`, sonst filtert der
+    Dialog die Zeile heraus): Stepper auf 2 → Tabellenzeile II hervorgehoben,
+    HeroBar-Knopf heißt „Zustände bearbeiten: Entrückung II"; Stufe 0 → Knopf heißt
+    „Zustände"
 12. Betäubung II + Furcht I → Talent-Tab „Gesamt −3 – Betäubung II −2, Furcht I −1",
     Rechenweg `13 − 3 − Wurf`, Historie mit Posten
 13. Verwirrung III → Zaubern-Knopf grau mit „Verwirrung III: Zaubern ist unmöglich."
 14. LeP auf 15/30 → „Schmerz II durch LeP" unter der Leiste, Attacke „Zustände −2"
 15. Berauscht IV → Toast, Betäubung +1, Berauscht 0
-16. v5-Blob mit `devotionLevel: 2` seeden → Entrückung II im Dialog, Blob wird als v6
-    zurückgeschrieben
+16. v5-Blob mit `devotionLevel: 2` seeden (Testcharakter braucht `karma.isBlessed ===
+    true`, sonst filtert der Dialog die Zeile heraus) → Entrückung II im Dialog, Blob
+    wird als v6 zurückgeschrieben

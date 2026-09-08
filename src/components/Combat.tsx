@@ -114,7 +114,7 @@ const Combat = () => {
 			id: snapshot.id,
 			type: 'Kampf',
 			values: snapshot.dice,
-			result: `${combatLabels[type]}: ${statusText(snapshot)} (${derivationText(snapshot)})`,
+			result: `${combatLabels[type]}: ${statusText(snapshot)} (${derivationText(snapshot)}${snapshot.conditionNote ? `, ${snapshot.conditionNote}` : ''})`,
 			date: new Date().toISOString()
 		}));
 	};
@@ -244,6 +244,7 @@ const Combat = () => {
 					<div className="grid grid-cols-1 gap-3 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-2">
 						{combatStats.map(({ type, key }) => {
 							const Icon = combatIcons[type];
+							const applied = conditionFor(type);
 							return (
 								<div
 									key={key}
@@ -257,9 +258,9 @@ const Combat = () => {
 										size="s"
 										onChange={(value) => dispatch(updateCombatStat({ key, value }))}
 									/>
-									{conditionFor(type).modifier !== 0 && (
+									{applied.modifier !== 0 && (
 										<span className="text-xs font-semibold text-amber-700 dark:text-amber-400">
-											Zustände {signedModifier(conditionFor(type).modifier)}
+											Zustände {signedModifier(applied.modifier)}
 										</span>
 									)}
 									<Button
@@ -333,6 +334,9 @@ const Combat = () => {
 								? <Check className="h-4 w-4 text-success-dark dark:text-success-light" aria-label="bestätigt" />
 								: <X className="h-4 w-4 text-failure-dark dark:text-failure-light" aria-label="nicht bestätigt" />}
 						</p>
+					)}
+					{lastRoll.conditionNote && (
+						<p className="text-xs text-muted-foreground">Zustände: {lastRoll.conditionNote}</p>
 					)}
 				</div>
 			}
