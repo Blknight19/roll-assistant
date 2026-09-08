@@ -25,6 +25,10 @@ import { addRoll } from '@/store/rollSlice';
 import { rollDie } from '@/utils/dice';
 import { evaluateCombatRoll } from '@/utils/rules';
 import { combatTone, consequenceText, derivationText, statusText } from '@/utils/combatText';
+import { useConditions } from '@/hooks/useConditions';
+import { INCAPACITATED_WARNING, conditionNote, type ConditionModifier } from '@/utils/conditionRules';
+import { ROMAN_LEVELS } from '@/data/conditions';
+import { signedModifier } from '@/utils/format';
 import { Swords, Shield, Footprints, Target, Clock, Heart, Sparkles, Skull, Check, X } from 'lucide-react';
 
 const combatLabels: Record<CombatType, string> = {
@@ -54,24 +58,37 @@ const combatStats: { type: CombatType; key: CombatStatKey }[] = [
 /** Ohne `id`: die vergibt erst der Aufrufer, damit die Würfel zuerst fallen. */
 type CombatRollDraft = Omit<CombatRoll, 'id'>;
 
-const buildInitiativeRoll = (base: number, modifier: number): CombatRollDraft => {
+const buildInitiativeRoll = (base: number, modifier: number, conditions: ConditionModifier): CombatRollDraft => {
 	const w6 = rollDie(6);
-	return { type: 'INI', base, modifier, initiative: base + w6 + modifier, dice: [w6] };
+	return {
+		type: 'INI',
+		base,
+		modifier,
+		conditionModifier: conditions.modifier,
+		conditionNote: conditionNote(conditions),
+		initiative: base + w6 + modifier + conditions.modifier,
+		dice: [w6]
+	};
 };
 
 const buildCheckRoll = (
 	type: CombatType,
 	base: number,
 	modifier: number,
+	conditions: ConditionModifier,
 	confirmCriticals: boolean
 ): CombatRollDraft => {
 	const d20 = rollDie(20);
 	const needsConfirmation = confirmCriticals && (d20 === 1 || d20 === 20);
-	const result = evaluateCombatRoll(base, modifier, d20, needsConfirmation ? rollDie(20) : undefined);
+	const result = evaluateCombatRoll(
+		base, modifier + conditions.modifier, d20, needsConfirmation ? rollDie(20) : undefined
+	);
 	return {
 		type,
 		base,
 		modifier,
+		conditionModifier: conditions.modifier,
+		conditionNote: conditionNote(conditions),
 		dice: result.confirmation ? [d20, result.confirmation.roll] : [d20],
 		result
 	};
@@ -82,11 +99,14 @@ const Combat = () => {
 	const combat = useSelector((state: RootState) => state.combat);
 	const confirmCriticals = useSelector((state: RootState) => state.settings.confirmCriticals);
 	const { modifier, lastRoll } = useSelector((state: RootState) => state.combatRoll);
+	const conditions = useConditions();
+	const conditionFor = (type: CombatType) => conditions.modifierFor({ kind: 'kampf', value: type });
 
 	const roll = (type: CombatType, base: number) => {
+		const applied = conditionFor(type);
 		const draft = type === 'INI'
-			? buildInitiativeRoll(base, modifier)
-			: buildCheckRoll(type, base, modifier, confirmCriticals);
+			? buildInitiativeRoll(base, modifier, applied)
+			: buildCheckRoll(type, base, modifier, applied, confirmCriticals);
 		const snapshot = { ...draft, id: nanoid() };
 
 		dispatch(setCombatLastRoll(snapshot));
@@ -155,6 +175,13 @@ const Combat = () => {
 							{combat.life.current} / {combat.life.max}
 						</span>
 					</div>
+
+					{conditions.painFromLife > 0 && (
+						<p className="text-center text-xs font-semibold text-amber-700 dark:text-amber-400">
+							Schmerz {ROMAN_LEVELS[conditions.painFromLife]} durch LeP
+							{conditions.toughDog ? ', Zäher Hund −1' : ''}
+						</p>
+					)}
 
 					<div className="flex flex-wrap items-center justify-center gap-2">
 						<span className="mr-1 font-heading text-sm uppercase tracking-wide text-parchment-700 dark:text-parchment-300">
@@ -230,6 +257,11 @@ const Combat = () => {
 										size="s"
 										onChange={(value) => dispatch(updateCombatStat({ key, value }))}
 									/>
+									{conditionFor(type).modifier !== 0 && (
+										<span className="text-xs font-semibold text-amber-700 dark:text-amber-400">
+											Zustände {signedModifier(conditionFor(type).modifier)}
+										</span>
+									)}
 									<Button
 										size="sm"
 										variant="parchment"
@@ -252,6 +284,12 @@ const Combat = () => {
 							/>
 						</div>
 					</div>
+
+					{conditions.incapacitated && (
+						<p className="mt-3 text-center text-xs font-semibold text-failure-dark dark:text-failure-light">
+							{INCAPACITATED_WARNING}
+						</p>
+					)}
 				</CardContent>
 			</Card>
 		</>

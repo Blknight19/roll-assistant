@@ -12,6 +12,9 @@ export type CombatRoll = {
 	/** Kampfwert vor dem Modifikator, für die Herleitung in der Anzeige. */
 	base: number;
 	modifier: number;
+	/** Anteil der Zustände, getrennt vom getippten Wert – die Herleitung zeigt beide. */
+	conditionModifier: number;
+	conditionNote?: string;
 	/** Nur bei INI gesetzt: Basiswert + 1W6 + Modifikator. */
 	initiative?: number;
 	/** Bei INI der W6, sonst der W20 (plus Bestätigungswurf, falls geworfen). */
