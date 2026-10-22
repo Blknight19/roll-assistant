@@ -183,7 +183,7 @@ const Spellbook = () => {
 							))}
 						</div>
 
-						<div className="hidden overflow-x-auto sm:block">
+						<div className="max-sm:hidden overflow-x-auto">
 							<table className="min-w-full text-sm">
 								<thead className="sticky top-0 z-10 bg-parchment-100 dark:bg-parchment-800">
 									<tr className="border-b-2 border-parchment-400 dark:border-parchment-600">

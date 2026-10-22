@@ -351,7 +351,7 @@ const Combat = () => {
 
 			{/* Auf dem Handy übernimmt die klebende Leiste unten – die Auslöser sitzen
 			    in den Kacheln, ein Ergebnis am Seitenanfang bliebe ungesehen. */}
-			<div className="hidden lg:sticky lg:top-24 lg:order-2 lg:block">
+			<div className="max-lg:hidden lg:sticky lg:top-24 lg:order-2">
 				{result}
 				{!result && (
 					<Card variant="parchment" className="border-dashed">

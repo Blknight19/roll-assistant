@@ -399,7 +399,7 @@ const SpellRoll = () => {
 			<div className="lg:sticky lg:top-24 lg:order-2">
 				{result}
 				{!result && (
-					<Card variant="parchment" className="hidden border-dashed lg:block">
+					<Card variant="parchment" className="max-lg:hidden border-dashed">
 						<CardContent className="flex flex-col items-center gap-3 py-16 text-center text-muted-foreground">
 							<Wand2 className="h-8 w-8 opacity-50" />
 							<p className="text-sm">

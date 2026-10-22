@@ -23,6 +23,9 @@ type RollBarProps = {
 	 * Die Leiste bringt ihren Breakpoint selbst mit, statt in einem Wrapper zu
 	 * stecken: ein Wrapper wäre der umschließende Block und exakt so hoch wie sie
 	 * – dann hat `position: sticky` keinen Weg und wirkt gar nicht.
+	 * Ausgeblendet wird über `max-lg:hidden` statt über `hidden` plus `lg:block`:
+	 * ein fremdes `.hidden{display:none!important}` – Browser-Erweiterungen bringen
+	 * so etwas mit – schlüge sonst die Breakpoint-Regel und die Leiste bliebe weg.
 	 */
 	sticky?: boolean;
 	/**
@@ -64,7 +67,7 @@ const RollBar = ({
 				'rounded-lg border border-parchment-300 bg-card p-4 shadow-lg dark:border-parchment-700',
 				sticky
 					? 'sticky bottom-4 z-40 mt-4 lg:hidden'
-					: 'hidden lg:sticky lg:bottom-4 lg:block',
+					: 'max-lg:hidden lg:sticky lg:bottom-4',
 				className
 			)}
 		>
